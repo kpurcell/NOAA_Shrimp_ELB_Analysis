@@ -1,0 +1,1045 @@
+Spatial Effort Analaysis
+========================================================
+###2013-9-18
+
+Import data from arcGIS:
+
+```{r}
+#####
+#Clear the junk
+graphics.off()
+rm(list=ls(all=TRUE))
+
+#setwd("C:/Users/kevin.purcell/Documents/NOAA_SpatialEffort_MS/mapping_2013-3-5")
+
+library(reshape)
+library(mgcv)  #loading the Woods GAM package
+library(lattice)
+library(maptools)
+library(maps)
+library(mapdata)
+
+#import new dbf file from spatial join off polygon 2 points
+#this data attaches centroid locations for 10x10 min grid cells with all 
+#6-8 elb data falling within those polygons
+
+library(foreign)
+
+elb.2mo.dat<-read.dbf(file="C:/Users/kevin.purcell/Documents/NOAA_SpatialEffort_MS/mapping_2013-3-5/poly2point_2mo_sz.dbf", as.is = FALSE)
+
+summary(elb.2mo.dat)
+
+elb.2mo.dat<-subset(elb.2mo.dat, elb.2mo.dat$depth<=100)
+```
+
+This dataset was preprocessed in GIS by:
+* Importing the raw ELB data and spatially mapping fishing locations
+* Overlaying using the fishnet function in arcCatalog a 10 x 10 min grid
+* These two layers were joined by assinging each fishing location to a grid cell
+* SEAMAP survey environmental and depth data were imported into arcMAP
+* polygon fishing effort was match with environmental data at 2 mon resolution
+* ADD MORE METHODS
+
+
+
+The effort of the fishery is a factor in the model.  We have two sources of data for fishery effort the ELB and the SHRCOM data.
+
+```{r}
+tot.eff<-aggregate(towhours ~ yr, data=elb.2mo.dat, FUN="sum") #ELB eff agg per JCK discuss
+colnames(tot.eff)[2]<-'tot.eff'
+
+plot(tot.eff$tot.eff~ tot.eff$yr, type="b",
+     ylab="Shrimping Effort (tow hours)",
+     xlab="Year",
+     main="ELB Effort Time Series")
+grid(col="gray")
+
+```
+
+ELB data on effort shows an increase from 2004-2009 with a big decline in 2010 and then a subsequent increase in 2010.  My thinking is that this represents sampling rather than the behavior of the fishery.  
+
+
+
+```{r}
+# import shrcom time series and examine
+shrcom.dat<-read.csv("C:/Users/kevin.purcell/Documents/comm_analysis/offshore_6011.csv", sep=",",header=T)
+shrcom.dat$hrs<-(shrcom.dat$effort*24)
+shrcom.sum<-subset(shrcom.dat, shrcom.dat$Season==2)
+shrcom.sum<-subset(shrcom.dat, shrcom.dat$area>=3)
+shrcom.yr<-aggregate(hrs ~ yr, data=shrcom.sum, FUN="sum")
+shrcom.yr<-subset(shrcom.yr, shrcom.yr$yr>=2004&shrcom.yr$yr<=2010)
+
+plot(shrcom.yr$hrs~ shrcom.yr$yr, type="b",
+     ylab="Shrimping Effort (tow hours)",
+     xlab="Year",
+     main="SHRCOM Effort Time Series")
+grid(col="gray")
+names(shrcom.yr)
+shrcom.mean<-mean(shrcom.yr$hrs)
+shrcom.yr$hrs<-(shrcom.yr$hrs/shrcom.mean)
+```
+
+The SHRCOM data shows sharp decline from 2004-2008 at which point it seems to stabalize. It seems that this time series is more representative of the fishery.  
+
+
+```{r}
+
+# shrimp abundance data itegrated to the 10x10 grid.
+abun.dat<-read.csv("C:/Users/kevin.purcell/Documents/NOAA_SpatialEffort_MS/grid2cpue.csv", sep=",",header=T)
+
+abun.dat<-subset(abun.dat, abun.dat$month>=6&abun.dat$month<=8)
+summary(abun.dat)
+#create a calendar week vector
+abun.dat$DATE<-paste(abun.dat$YR, abun.dat$month, sep="-")
+abun.dat$DATE<-paste(abun.dat$DATE, abun.dat$day, sep="-")
+#abun.dat$DATE <- as.POSIXlt(abun.dat$DATE)
+abun.dat$CW <- strftime(abun.dat$DATE,format="%W")
+abun.dat$jd <- strftime(abun.dat$DATE, format="%j")
+abun.dat$CW<-as.numeric(abun.dat$CW)
+abun.dat$jd<-as.numeric(abun.dat$jd)
+
+abun.avg=aggregate(cpue ~ cent_lon + cent_lat + YR,
+                       data=abun.dat, FUN=mean)
+summary(abun.avg)
+#boxplot(abun.avg$cpue ~ abun.avg$YR)
+#hist(abun.avg$cpue)
+#stem(abun.avg$cpue)
+#abun.avg<-subset(abun.avg, abun.avg$cpue<10)
+
+
+```
+
+```{r}
+#fuel price data
+fuel.dat<-read.table("C:/Users/kevin.purcell/Documents/NOAA_SpatialEffort_MS/la_fuel_price.csv", sep=",", header=T)
+fuel.dat$DATE<-paste(fuel.dat$yr, fuel.dat$mo, sep="-")
+fuel.dat$DATE<-paste(fuel.dat$DATE, fuel.dat$day, sep="-")
+fuel.dat$CW <- strftime(fuel.dat$DATE,format="%W")
+fuel.dat$jd <- strftime(fuel.dat$DATE, format="%j")
+fuel.dat$CW<-as.numeric(fuel.dat$CW)
+fuel.dat$jd<-as.numeric(fuel.dat$jd)
+fuel.agg<-aggregate(la_fuel_price ~ yr, data=fuel.dat, FUN=mean)
+
+boxplot(fuel.dat$la_fuel_price~fuel.dat$yr,
+        main="Fuel Price Variation")
+grid(col="gray")
+
+#plot
+plot(fuel.agg$la_fuel_price~fuel.agg$yr, type="b",
+     ylab="Fuel Price",
+     xlab="Year",
+     main="Fuel Price Timeseries for Los Angeles")
+grid(col="gray")
+```
+
+```{r}
+#price data
+ppnd.dat=read.csv("C:/Users/kevin.purcell/Documents/NOAA_SpatialEffort_MS/ppnd.csv", sep=",",header=T)
+summary(ppnd.dat)
+ppnd.dat$PRICEPPND<-ppnd.dat$PRICEPPND/100
+colnames(ppnd.dat)[1]<-'sz'
+colnames(ppnd.dat)[2]<-'yr'
+colnames(ppnd.dat)[5]<-'ppnd'
+#limit ppnd data
+ppnd.dat<-subset(ppnd.dat, ppnd.dat$ppnd<=6)
+ppnd.yr<-aggregate(ppnd~yr, data=ppnd.dat, FUN=mean)
+
+
+boxplot(ppnd.dat$ppnd~ppnd.dat$yr,
+        main="Shrimp Price Variation")
+grid(col="gray")
+
+
+plot(ppnd.yr$ppnd~ppnd.yr$yr, type="b",
+     ylab="Price per Pond (USD)",
+     xlab="Year",
+     main="Shrimp Price Time Series")
+grid(col="gray")
+
+
+
+#remove data points where centroid data is missing
+elb.2mo.dat<- subset(elb.2mo.dat, elb.2mo.dat$cent_lon!=0)
+elb.2mo.dat<- subset(elb.2mo.dat, elb.2mo.dat$ZONE!=0)
+#elb.2mo.dat = 149840
+
+#rename some columns in the new dataset
+colnames(elb.2mo.dat)[12]<-'grid_cell'
+colnames(elb.2mo.dat)[3]<-'vesselID'
+colnames(elb.2mo.dat)[10]<-'depth'
+colnames(elb.2mo.dat)[17]<-'sz'
+elb.2mo.dat$FID_1<-NULL
+elb.2mo.dat$FID_3<-NULL
+elb.2mo.dat$FID_1_1<-NULL
+elb.2mo.dat$Id<-NULL
+                 
+#create date stuff
+#create a calendar week vector
+elb.2mo.dat$DATE<-paste(elb.2mo.dat$yr, elb.2mo.dat$mon, sep="-")
+elb.2mo.dat$DATE<-paste(elb.2mo.dat$DATE, elb.2mo.dat$day, sep="-")
+#elb.2mo.dat$DATE <- as.POSIXlt(elb.2mo.dat$DATE)
+elb.2mo.dat$CW <- strftime(elb.2mo.dat$DATE,format="%W")
+elb.2mo.dat$jd <- strftime(elb.2mo.dat$DATE, format="%j")
+elb.2mo.dat$CW<-as.numeric(elb.2mo.dat$CW)
+elb.2mo.dat$jd<-as.numeric(elb.2mo.dat$jd)
+summary(elb.2mo.dat)
+
+```
+
+
+```{r}
+hypox.area=read.table("C:/Users/kevin.purcell/Documents/NOAA_SpatialEffort_MS/analysis/area_of_hypoxia_NR.csv", sep=",",header=T)
+colnames(hypox.area)[1]<-'yr'
+
+plot(hypox.area$area.hypoxic~hypox.area$yr, type="b",
+     ylab="Areial Extent of Hypoxia (sq km)",
+     xlab="Year",
+     main="Rabalais Hypoxia Time Series")
+grid(col="gray")
+
+```
+
+
+Average out the environmental data per cell and integrate the data sets into modeling data sets
+
+```{r}
+
+summary(elb.2mo.dat)
+
+#aggregate response variables to polygons
+
+grid.2mo.avg=aggregate(cbind(do, depth) ~ grid_cell * cent_lon * cent_lat* yr * jd,
+                       data=elb.2mo.dat, FUN=mean)
+tx.cells=length(grid.2mo.avg$do[grid.2mo.avg$cent_lon<(-94)])
+la.cells=length(grid.2mo.avg$do[grid.2mo.avg$cent_lon>(-94)])
+
+
+
+#aggregate 2mo responses to grid cells by jd
+g2mo.dur<-aggregate(towhours ~ grid_cell * cent_lon * cent_lat * yr * jd ,
+                    data=elb.2mo.dat, FUN=sum)
+g2mo.avg.dur<-aggregate(towhours ~ grid_cell * cent_lon * cent_lat * yr * jd,
+                        data=elb.2mo.dat, FUN=mean)
+colnames(g2mo.avg.dur)[6]<-'avg.dur'
+g2mo.tow.count<-aggregate(towhours ~ grid_cell * cent_lon * cent_lat* yr * jd,
+                          data=elb.2mo.dat, FUN=length)
+colnames(g2mo.tow.count)[6]<-'tow.cnt'
+g2mo.vess.count<-aggregate(vesselID ~ grid_cell * cent_lon * cent_lat* yr * jd,
+                           data=elb.2mo.dat, FUN=length)
+colnames(g2mo.vess.count)[6]<-'vess.cnt'
+
+
+
+#merge with avg environmental conditions
+gam.2mo.dur<-merge(g2mo.dur, grid.2mo.avg, all.x=T,
+                   by=c("grid_cell", "cent_lon", "cent_lat", "yr", "jd"))
+colnames(abun.avg)[3]<-'yr'
+gam.2mo.dur<-merge(gam.2mo.dur, abun.avg, all.x=T,
+                   by=c("cent_lon", "cent_lat", "yr"))
+
+
+gam.2mo.dur$sz<-gam.2mo.dur$grid_cell
+gam.2mo.dur$sz[gam.2mo.dur$cent_lon>-90&gam.2mo.dur$cent_lon<=-89]=13
+gam.2mo.dur$sz[gam.2mo.dur$cent_lon>-91&gam.2mo.dur$cent_lon<=-90]=14
+gam.2mo.dur$sz[gam.2mo.dur$cent_lon>-92&gam.2mo.dur$cent_lon<=-91]=15
+gam.2mo.dur$sz[gam.2mo.dur$cent_lon>-93&gam.2mo.dur$cent_lon<=-92]=16
+gam.2mo.dur$sz[gam.2mo.dur$cent_lon>-94&gam.2mo.dur$cent_lon<=-93]=17
+
+gam.2mo.dur$sz[gam.2mo.dur$cent_lon>-95&gam.2mo.dur$cent_lon<=-94]=18
+gam.2mo.dur$sz[gam.2mo.dur$cent_lon<=-95&gam.2mo.dur$cent_lat>28]=19
+gam.2mo.dur$sz[gam.2mo.dur$cent_lat>=27&gam.2mo.dur$cent_lat<28]=20
+gam.2mo.dur$sz[gam.2mo.dur$cent_lat>=26&gam.2mo.dur$cent_lat<27]=21
+
+gam.2mo.dur<-merge(gam.2mo.dur, ppnd.dat,all.x=T,
+                   by=c("yr", "jd", "sz"))
+
+gam.2mo.dur<-merge(gam.2mo.dur, hypox.area,all.x=T,
+                   by="yr")
+gam.2mo.dur<-merge(gam.2mo.dur, shrcom.yr, all.x=T,
+                       by="yr")
+
+fuel.agg<-aggregate(la_fuel_price ~ CW + yr, data=fuel.dat, FUN=mean)
+gam.2mo.dur=merge(gam.2mo.dur, fuel.agg, by=c("CW","yr"), all.x=T)
+
+summary(gam.2mo.dur)
+
+#merge 
+gam.2mo.avg.dur<-merge(g2mo.avg.dur, grid.2mo.avg, all.x=T,
+                   by=c("grid_cell", "cent_lon", "cent_lat", "yr", "jd"))
+colnames(abun.avg)[3]<-'yr'
+gam.2mo.avg.dur<-merge(gam.2mo.avg.dur, abun.avg, all.x=T,
+                   by=c("cent_lon", "cent_lat", "yr"))
+
+gam.2mo.avg.dur$sz<-gam.2mo.avg.dur$grid_cell
+gam.2mo.avg.dur$sz[gam.2mo.avg.dur$cent_lon>-90&gam.2mo.avg.dur$cent_lon<=-89]=13
+gam.2mo.avg.dur$sz[gam.2mo.avg.dur$cent_lon>-91&gam.2mo.avg.dur$cent_lon<=-90]=14
+gam.2mo.avg.dur$sz[gam.2mo.avg.dur$cent_lon>-92&gam.2mo.avg.dur$cent_lon<=-91]=15
+gam.2mo.avg.dur$sz[gam.2mo.avg.dur$cent_lon>-93&gam.2mo.avg.dur$cent_lon<=-92]=16
+gam.2mo.avg.dur$sz[gam.2mo.avg.dur$cent_lon>-94&gam.2mo.avg.dur$cent_lon<=-93]=17
+
+gam.2mo.avg.dur$sz[gam.2mo.avg.dur$cent_lon>-95&gam.2mo.avg.dur$cent_lon<=-94]=18
+gam.2mo.avg.dur$sz[gam.2mo.avg.dur$cent_lon<=-95&gam.2mo.avg.dur$cent_lat>28]=19
+gam.2mo.avg.dur$sz[gam.2mo.avg.dur$cent_lat>=27&gam.2mo.avg.dur$cent_lat<28]=20
+gam.2mo.avg.dur$sz[gam.2mo.avg.dur$cent_lat>=26&gam.2mo.avg.dur$cent_lat<27]=21
+
+gam.2mo.avg.dur<-merge(gam.2mo.avg.dur, ppnd.dat,all.x=T,
+                   by=c("yr", "jd", "sz"))
+
+gam.2mo.avg.dur<-merge(gam.2mo.avg.dur, hypox.area,all.x=T,
+                   by="yr")
+gam.2mo.avg.dur<-merge(gam.2mo.avg.dur, shrcom.yr, all.x=T,
+                          by="yr")
+gam.2mo.avg.dur=merge(gam.2mo.avg.dur, fuel.agg, by="CW", all.x=T)
+
+#merge with avg environmental conditions
+gam.2mo.tow.count<-merge(g2mo.tow.count, grid.2mo.avg, all.x=T,
+                   by=c("grid_cell", "cent_lon", "cent_lat", "yr", "jd"))
+colnames(abun.avg)[3]<-'yr'
+gam.2mo.tow.count<-merge(gam.2mo.tow.count, abun.avg, all.x=T,
+                   by=c("cent_lon", "cent_lat", "yr"))
+
+gam.2mo.tow.count$sz<-gam.2mo.tow.count$grid_cell
+gam.2mo.tow.count$sz[gam.2mo.tow.count$cent_lon>-90&gam.2mo.tow.count$cent_lon<=-89]=13
+gam.2mo.tow.count$sz[gam.2mo.tow.count$cent_lon>-91&gam.2mo.tow.count$cent_lon<=-90]=14
+gam.2mo.tow.count$sz[gam.2mo.tow.count$cent_lon>-92&gam.2mo.tow.count$cent_lon<=-91]=15
+gam.2mo.tow.count$sz[gam.2mo.tow.count$cent_lon>-93&gam.2mo.tow.count$cent_lon<=-92]=16
+gam.2mo.tow.count$sz[gam.2mo.tow.count$cent_lon>-94&gam.2mo.tow.count$cent_lon<=-93]=17
+
+gam.2mo.tow.count$sz[gam.2mo.tow.count$cent_lon>-95&gam.2mo.tow.count$cent_lon<=-94]=18
+gam.2mo.tow.count$sz[gam.2mo.tow.count$cent_lon<=-95&gam.2mo.tow.count$cent_lat>28]=19
+gam.2mo.tow.count$sz[gam.2mo.tow.count$cent_lat>=27&gam.2mo.tow.count$cent_lat<28]=20
+gam.2mo.tow.count$sz[gam.2mo.tow.count$cent_lat>=26&gam.2mo.tow.count$cent_lat<27]=21
+
+gam.2mo.tow.count<-merge(gam.2mo.tow.count, ppnd.dat,all.x=T,
+                   by=c("yr", "jd", "sz"))
+
+gam.2mo.tow.count<-merge(gam.2mo.tow.count, hypox.area,all.x=T,
+                   by="yr")
+gam.2mo.tow.count<-merge(gam.2mo.tow.count, shrcom.yr, all.x=T,
+                          by="yr")
+names(gam.2mo.tow.count)
+colnames(gam.2mo.tow.count)[6]<-'CW'
+colnames(gam.2mo.tow.count)[11]<-'ppnd'
+colnames(gam.2mo.tow.count)[12]<-'area.hypoxic'
+colnames(gam.2mo.tow.count)[13]<-'hrs'
+gam.2mo.tow.count=merge(gam.2mo.tow.count, fuel.agg, by="CW", all.x=T)
+
+
+#make two data sets a LA and TX
+gam.2mo.dur.la<-subset(gam.2mo.dur, gam.2mo.dur$cent_lon>=-93.83)
+gam.2mo.dur.tx<-subset(gam.2mo.dur, gam.2mo.dur$cent_lon< -93.83)
+gam.2mo.avg.dur.la<-subset(gam.2mo.avg.dur, gam.2mo.avg.dur$cent_lon>=-93.83)
+gam.2mo.avg.dur.tx<-subset(gam.2mo.avg.dur, gam.2mo.avg.dur$cent_lon< -93.83)
+gam.2mo.tow.count.la<-subset(gam.2mo.tow.count, gam.2mo.tow.count$cent_lon>=-93.83)
+gam.2mo.tow.count.tx<-subset(gam.2mo.tow.count, gam.2mo.tow.count$cent_lon< -93.83)
+# gam.2mo.vess.count.la<-subset(gam.2mo.vess.count, gam.2mo.vess.count$cent_lon>=-93.83)
+# gam.2mo.vess.count.tx<-subset(gam.2mo.vess.count, gam.2mo.vess.count$cent_lon< -93.83)
+
+save.image("C:/Users/kevin.purcell/Documents/NOAA_SpatialEffort_MS/GAM_2013-9-19.RData")
+
+
+
+#total effort or duration in a cell calculated by FUN=sum
+summary(gam.2mo.dur)
+
+#make region code
+gam.2mo.dur$region<-gam.2mo.dur$sz
+gam.2mo.dur$region[gam.2mo.dur$sz>=13&gam.2mo.dur$sz<=17]="LA"
+gam.2mo.dur$region[gam.2mo.dur$sz>=18&gam.2mo.dur$sz<=21]="TX"                 
+ 
+gam.dur<-gam.2mo.dur[,c("yr","jd","hrs","do","depth", "ppnd", "la_fuel_price","towhours","area.hypoxic","cent_lon","cent_lat")]    
+
+summary(gam.dur)
+par(mfrow=c(2,2))
+hist(gam.dur$yr)
+hist(gam.dur$jd)
+boxplot(gam.dur$do~gam.dur$yr)
+boxplot(gam.dur$depth~gam.dur$yr)
+
+gam.dur.la<-gam.2mo.dur.la[,c("jd", "hrs","do","depth", "ppnd", "la_fuel_price","towhours","area.hypoxic","cent_lon", "cent_lat")]
+gam.dur.la<-na.omit(gam.dur.la)
+# 
+# gam.dur.tx<-gam.2mo.dur.tx[,c("jd", "hrs","do","depth", "ppnd", "la_fuel_price","towhours","area.hypoxic","cent_lon", "cent_lat")]
+# gam.dur.tx<-na.omit(gam.dur.tx)
+```
+
+```{r}
+#remove na's
+gam.dur<-na.omit(gam.dur)
+gam.dur.2004<-subset(gam.dur, gam.dur$yr==2004)
+gam.dur.2005<-subset(gam.dur, gam.dur$yr==2005)
+gam.dur.2006<-subset(gam.dur, gam.dur$yr==2006)
+gam.dur.2007<-subset(gam.dur, gam.dur$yr==2007)
+gam.dur.2008<-subset(gam.dur, gam.dur$yr==2008)
+gam.dur.2009<-subset(gam.dur, gam.dur$yr==2009)
+gam.dur.2010<-subset(gam.dur, gam.dur$yr==2010)
+gam.dur.2010<-subset(gam.dur, gam.dur$yr==2010)
+
+
+#GOM model
+gom1<-gam(log(towhours+1) ~ factor(yr) + la_fuel_price  + hrs + area.hypoxic + 
+          s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat), 
+          data=gam.dur)
+
+gom2<-gam(log(towhours+1) ~ factor(yr) + la_fuel_price  + hrs + area.hypoxic + 
+          s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
+          s(cent_lon,cent_lat, by=area.hypoxic) + s(cent_lon,cent_lat, by=hrs),
+          data=gam.dur)
+
+#
+gam.check(gom1)
+gam.check(gom2)
+
+
+summary(gom1)
+summary(gom2)
+
+par(mfrow=c(2,2))
+plot(gom2, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Dissolved Oxygen (mg/L)")
+text(.4, -0.72, "A", cex=1.5,font=2)
+plot(gom2, select=2, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+text(3, -2, "B", cex=1.5,font=2)
+plot(gom2, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+text(0.4, -0.6, "C", cex=1.5,font=2)
+plot(gom2, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Julian Day" )
+text(1.563, -0.44, "D", cex=1.5,font=2)
+
+plot(gom2, select=6, se=F, rug=F, scheme=2,
+     xlab="Longitude",
+     ylab="Latitude",
+     main="Effect of area of hypoxia") 
+map("state",fill=T,col="gray",add=T)
+
+plot(gom2, select=7, se=F, rug=F, scheme=2,
+     xlab="Longitude",
+     ylab="Latitude",
+     main="Effect of effort") 
+map("state",fill=T,col="gray",add=T)
+
+
+
+#Get slope coefficients for gom2 model
+pred<-predict(gom2, type='terms')
+pred.slope<-(pred[,10]) #number is the column or specific term you want to produce plots for
+hist(pred.slope, main='All Slopes')
+max.t<-max(abs(pred.slope))
+
+par(mfrow=c(1,2))
+vis.gam(gom2, view=c("cent_lon", "cent_lat"), 
+        plot.type="contour", type="response", contour="black",
+        color="topo", n.grid=50, too.far=0.2,
+        main="", ylab="Latitude", xlab="Longitude")
+map("worldHires", fill=T, col="grey",add=T)
+
+
+
+plot(gam.dur$cent_lon, gam.dur$cent_lat, pch="", 
+     ylab="Latitude", xlab="Longitude")
+# vis.gam(la2b, view=c("cent_lon", "cent_lat"), 
+#         plot.type="contour", type="link", contour="black",
+#         color="gray", n.grid=50, too.far=0.5,
+#         main="", ylab="Latitude", xlab="Longitude")
+symbols(gam.dur$cent_lon[pred.slope>=0],gam.dur$cent_lat[pred.slope>=0],
+        circle=pred.slope[pred.slope>=0],inches=0.2*max(pred.slope[pred.slope>=0])/max.t,add=T,fg='red')
+symbols(gam.dur$cent_lon[pred.slope<=0],gam.dur$cent_lat[pred.slope<=0],
+        circle=abs(pred.slope[pred.slope<=0]),inches=0.2*max(abs(pred.slope[pred.slope<=0]))/max.t,add=T,fg='blue')
+map("worldHires", fill=T, col="grey",add=T)
+```
+
+
+```{r}
+#old model
+old1<-gam(log(towhours+1) ~ s(jd) + s(depth) + s(ppnd) + s(cent_lon,cent_lat) + s(cent_lon,cent_lat, by=area.hypoxic),data=gam.dur)
+old2<-gam(log(towhours+1) ~ jd + hrs + s(do) + s(depth) + s(ppnd) + s(la_fuel_price) + s(cent_lon,cent_lat) + s(cent_lon,cent_lat, by=area.hypoxic) + s(cent_lon,cent_lat, by=hrs),
+         data=gam.dur)
+
+summary(old1)
+summary(old2)
+
+
+par(mfrow=c(2,3))
+
+plot(old1, select=2, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+text(3, -2, "B", cex=1.5,font=2)
+plot(old1, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+text(0.4, -0.6, "C", cex=1.5,font=2)
+plot(old1, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Fuel Price (USD)" )
+text(1.563, -0.44, "D", cex=1.5,font=2)
+plot(old1, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Julian Day")
+text(.4, -0.72, "A", cex=1.5,font=2)
+
+par(mfrow=c(2,2))
+plot(old2, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Dissolved Oxygen (mg/L)")
+text(.4, -0.72, "A", cex=1.5,font=2)
+plot(old2, select=2, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+text(3, -2, "B", cex=1.5,font=2)
+plot(old2, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+text(0.4, -0.6, "C", cex=1.5,font=2)
+plot(old2, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Fuel Price (USD)" )
+text(1.563, -0.44, "D", cex=1.5,font=2)
+
+
+#Get slope coefficients for gom2 model
+pred<-predict(old1, type='terms')
+head(pred)
+pred.slope<-(pred[,7]) #number is the column or specific term you want to produce plots for
+hist(pred.slope, main='All Slopes')
+max.t<-max(abs(pred.slope))
+par(mfrow=c(1,2))
+vis.gam(old1, view=c("cent_lon", "cent_lat"), 
+        plot.type="contour", type="response", contour="black",
+        color="topo", n.grid=50, too.far=0.2,
+        main="", ylab="Latitude", xlab="Longitude")
+map("worldHires", fill=T, col="grey",add=T)
+
+
+
+plot(gam.dur$cent_lon, gam.dur$cent_lat, pch="", 
+     ylab="Latitude", xlab="Longitude")
+# vis.gam(la2b, view=c("cent_lon", "cent_lat"), 
+#         plot.type="contour", type="link", contour="black",
+#         color="gray", n.grid=50, too.far=0.5,
+#         main="", ylab="Latitude", xlab="Longitude")
+symbols(gam.dur$cent_lon[pred.slope>=0],gam.dur$cent_lat[pred.slope>=0],
+        circle=pred.slope[pred.slope>=0],inches=0.2*max(pred.slope[pred.slope>=0])/max.t,add=T,fg='blue')
+symbols(gam.dur$cent_lon[pred.slope<=0],gam.dur$cent_lat[pred.slope<=0],
+        circle=abs(pred.slope[pred.slope<=0]),inches=0.2*max(abs(pred.slope[pred.slope<=0]))/max.t,add=T,fg='red')
+map("worldHires", fill=T, col="grey",add=T)
+```
+
+```{r}
+#gams by year
+
+m2004<-gam(log(towhours+1) ~ area.hypoxic + s(jd) +  s(depth) + s(ppnd) + s(cent_lon,cent_lat) + s(cent_lon,cent_lat, by=do),data=gam.dur.2004)
+m2005<-gam(log(towhours+1) ~ area.hypoxic +s(jd) + s(depth) + s(ppnd) + s(cent_lon,cent_lat) + s(cent_lon,cent_lat, by=do),data=gam.dur.2005)
+m2006<-gam(log(towhours+1) ~ area.hypoxic +s(jd) + s(depth) + s(ppnd) + s(cent_lon,cent_lat) + s(cent_lon,cent_lat, by=do),data=gam.dur.2006)
+m2007<-gam(log(towhours+1) ~ area.hypoxic +s(jd) + s(depth) + s(ppnd) + s(cent_lon,cent_lat) + s(cent_lon,cent_lat, by=do),data=gam.dur.2007)
+m2008<-gam(log(towhours+1) ~ area.hypoxic +s(jd) + s(depth) + s(ppnd) + s(cent_lon,cent_lat) + s(cent_lon,cent_lat, by=do),data=gam.dur.2008)
+m2009<-gam(log(towhours+1) ~ area.hypoxic +s(jd) + s(depth) + s(ppnd) + s(cent_lon,cent_lat) + s(cent_lon,cent_lat, by=do),data=gam.dur.2009)
+m2010<-gam(log(towhours+1) ~ area.hypoxic +s(jd) + s(depth) + s(ppnd) + s(cent_lon,cent_lat) + s(cent_lon,cent_lat, by=do),data=gam.dur.2010)
+m2010<-gam(log(towhours+1) ~ area.hypoxic +s(jd) + s(depth) + s(ppnd) + s(cent_lon,cent_lat) + s(cent_lon,cent_lat, by=do),data=gam.dur.2010)
+
+
+
+par(mfrow=c(2,3))
+plot(m2004, select=2, shade=T, all.terms=T, scale=0,
+     xlab="DO (mg/L)")
+plot(m2004, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+plot(m2004, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+plot(m2004, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Julian Day")
+
+#Get slope coefficients for gom2 model
+pred<-predict(m2004, type='terms')
+head(pred)
+pred.slope<-(pred[,6]) #number is the column or specific term you want to produce plots for
+hist(pred.slope, main='All Slopes')
+max.t<-max(abs(pred.slope))
+
+par(mfrow=c(1,2))
+vis.gam(m2004, view=c("cent_lon", "cent_lat"), 
+        plot.type="contour", type="response", contour="black",
+        color="topo", n.grid=50, too.far=0.2,
+        main="", ylab="Latitude", xlab="Longitude")
+map("worldHires", fill=T, col="grey",add=T)
+
+
+
+plot(gam.dur.2004$cent_lon, gam.dur.2004$cent_lat, pch="", 
+     ylab="Latitude", xlab="Longitude")
+# vis.gam(la2b, view=c("cent_lon", "cent_lat"), 
+#         plot.type="contour", type="link", contour="black",
+#         color="gray", n.grid=50, too.far=0.5,
+#         main="", ylab="Latitude", xlab="Longitude")
+symbols(gam.dur.2004$cent_lon[pred.slope>=0],gam.dur.2004$cent_lat[pred.slope>=0],
+        circle=pred.slope[pred.slope>=0],inches=0.2*max(pred.slope[pred.slope>=0])/max.t,add=T,fg='blue')
+symbols(gam.dur.2004$cent_lon[pred.slope<=0],gam.dur.2004$cent_lat[pred.slope<=0],
+        circle=abs(pred.slope[pred.slope<=0]),inches=0.2*max(abs(pred.slope[pred.slope<=0]))/max.t,add=T,fg='red')
+map("worldHires", fill=T, col="grey",add=T)
+
+### 2005 ####
+#############
+
+par(mfrow=c(2,3))
+plot(m2005, select=2, shade=T, all.terms=T, scale=0,
+     xlab="DO (mg/L)")
+plot(m2005, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+plot(m2005, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+plot(m2005, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Julian Day")
+
+#Get slope coefficients for gom2 model
+pred<-predict(m2005, type='terms')
+head(pred)
+pred.slope<-(pred[,6]) #number is the column or specific term you want to produce plots for
+hist(pred.slope, main='All Slopes')
+max.t<-max(abs(pred.slope))
+
+par(mfrow=c(1,2))
+vis.gam(m2005, view=c("cent_lon", "cent_lat"), 
+        plot.type="contour", type="response", contour="black",
+        color="topo", n.grid=50, too.far=0.2,
+        main="", ylab="Latitude", xlab="Longitude")
+map("worldHires", fill=T, col="grey",add=T)
+
+
+
+plot(gam.dur.2005$cent_lon, gam.dur.2005$cent_lat, pch="", 
+     ylab="Latitude", xlab="Longitude")
+# vis.gam(la2b, view=c("cent_lon", "cent_lat"), 
+#         plot.type="contour", type="link", contour="black",
+#         color="gray", n.grid=50, too.far=0.5,
+#         main="", ylab="Latitude", xlab="Longitude")
+symbols(gam.dur.2005$cent_lon[pred.slope>=0],gam.dur.2005$cent_lat[pred.slope>=0],
+        circle=pred.slope[pred.slope>=0],inches=0.2*max(pred.slope[pred.slope>=0])/max.t,add=T,fg='blue')
+symbols(gam.dur.2005$cent_lon[pred.slope<=0],gam.dur.2005$cent_lat[pred.slope<=0],
+        circle=abs(pred.slope[pred.slope<=0]),inches=0.2*max(abs(pred.slope[pred.slope<=0]))/max.t,add=T,fg='red')
+map("worldHires", fill=T, col="grey",add=T)
+
+
+#########
+##2006###
+#########
+
+par(mfrow=c(2,3))
+plot(m2006, select=2, shade=T, all.terms=T, scale=0,
+     xlab="DO (mg/L)")
+plot(m2006, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+plot(m2006, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+plot(m2006, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Julian Day")
+
+#Get slope coefficients for gom2 model
+pred<-predict(m2006, type='terms')
+head(pred)
+pred.slope<-(pred[,6]) #number is the column or specific term you want to produce plots for
+hist(pred.slope, main='All Slopes')
+max.t<-max(abs(pred.slope))
+
+par(mfrow=c(1,2))
+vis.gam(m2006, view=c("cent_lon", "cent_lat"), 
+        plot.type="contour", type="response", contour="black",
+        color="topo", n.grid=50, too.far=0.2,
+        main="", ylab="Latitude", xlab="Longitude")
+map("worldHires", fill=T, col="grey",add=T)
+
+
+
+plot(gam.dur.2006$cent_lon, gam.dur.2006$cent_lat, pch="", 
+     ylab="Latitude", xlab="Longitude")
+# vis.gam(la2b, view=c("cent_lon", "cent_lat"), 
+#         plot.type="contour", type="link", contour="black",
+#         color="gray", n.grid=50, too.far=0.5,
+#         main="", ylab="Latitude", xlab="Longitude")
+symbols(gam.dur.2006$cent_lon[pred.slope>=0],gam.dur.2006$cent_lat[pred.slope>=0],
+        circle=pred.slope[pred.slope>=0],inches=0.2*max(pred.slope[pred.slope>=0])/max.t,add=T,fg='blue')
+symbols(gam.dur.2006$cent_lon[pred.slope<=0],gam.dur.2006$cent_lat[pred.slope<=0],
+        circle=abs(pred.slope[pred.slope<=0]),inches=0.2*max(abs(pred.slope[pred.slope<=0]))/max.t,add=T,fg='red')
+map("worldHires", fill=T, col="grey",add=T)
+
+#########
+##2007###
+#########
+
+par(mfrow=c(2,3))
+plot(m2007, select=2, shade=T, all.terms=T, scale=0,
+     xlab="DO (mg/L)")
+plot(m2007, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+plot(m2007, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+plot(m2007, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Julian Day")
+
+#Get slope coefficients for gom2 model
+pred<-predict(m2007, type='terms')
+head(pred)
+pred.slope<-(pred[,6]) #number is the column or specific term you want to produce plots for
+hist(pred.slope, main='All Slopes')
+max.t<-max(abs(pred.slope))
+
+par(mfrow=c(1,2))
+vis.gam(m2007, view=c("cent_lon", "cent_lat"), 
+        plot.type="contour", type="response", contour="black",
+        color="topo", n.grid=50, too.far=0.2,
+        main="", ylab="Latitude", xlab="Longitude")
+map("worldHires", fill=T, col="grey",add=T)
+
+
+
+plot(gam.dur.2007$cent_lon, gam.dur.2007$cent_lat, pch="", 
+     ylab="Latitude", xlab="Longitude")
+# vis.gam(la2b, view=c("cent_lon", "cent_lat"), 
+#         plot.type="contour", type="link", contour="black",
+#         color="gray", n.grid=50, too.far=0.5,
+#         main="", ylab="Latitude", xlab="Longitude")
+symbols(gam.dur.2007$cent_lon[pred.slope>=0],gam.dur.2007$cent_lat[pred.slope>=0],
+        circle=pred.slope[pred.slope>=0],inches=0.2*max(pred.slope[pred.slope>=0])/max.t,add=T,fg='blue')
+symbols(gam.dur.2007$cent_lon[pred.slope<=0],gam.dur.2007$cent_lat[pred.slope<=0],
+        circle=abs(pred.slope[pred.slope<=0]),inches=0.2*max(abs(pred.slope[pred.slope<=0]))/max.t,add=T,fg='red')
+map("worldHires", fill=T, col="grey",add=T)
+
+#########
+##2008###
+#########
+
+par(mfrow=c(2,3))
+plot(m2008, select=2, shade=T, all.terms=T, scale=0,
+     xlab="DO (mg/L)")
+plot(m2008, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+plot(m2008, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+plot(m2008, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Julian Day")
+
+#Get slope coefficients for gom2 model
+pred<-predict(m2008, type='terms')
+head(pred)
+pred.slope<-(pred[,6]) #number is the column or specific term you want to produce plots for
+hist(pred.slope, main='All Slopes')
+max.t<-max(abs(pred.slope))
+
+par(mfrow=c(1,2))
+vis.gam(m2008, view=c("cent_lon", "cent_lat"), 
+        plot.type="contour", type="response", contour="black",
+        color="topo", n.grid=50, too.far=0.2,
+        main="", ylab="Latitude", xlab="Longitude")
+map("worldHires", fill=T, col="grey",add=T)
+
+
+
+plot(gam.dur.2008$cent_lon, gam.dur.2008$cent_lat, pch="", 
+     ylab="Latitude", xlab="Longitude")
+# vis.gam(la2b, view=c("cent_lon", "cent_lat"), 
+#         plot.type="contour", type="link", contour="black",
+#         color="gray", n.grid=50, too.far=0.5,
+#         main="", ylab="Latitude", xlab="Longitude")
+symbols(gam.dur.2008$cent_lon[pred.slope>=0],gam.dur.2008$cent_lat[pred.slope>=0],
+        circle=pred.slope[pred.slope>=0],inches=0.2*max(pred.slope[pred.slope>=0])/max.t,add=T,fg='blue')
+symbols(gam.dur.2008$cent_lon[pred.slope<=0],gam.dur.2008$cent_lat[pred.slope<=0],
+        circle=abs(pred.slope[pred.slope<=0]),inches=0.2*max(abs(pred.slope[pred.slope<=0]))/max.t,add=T,fg='red')
+map("worldHires", fill=T, col="grey",add=T)
+
+#########
+##2009###
+#########
+
+par(mfrow=c(2,3))
+plot(m2009, select=2, shade=T, all.terms=T, scale=0,
+     xlab="DO (mg/L)")
+plot(m2009, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+plot(m2009, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+plot(m2009, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Julian Day")
+
+#Get slope coefficients for gom2 model
+pred<-predict(m2009, type='terms')
+head(pred)
+pred.slope<-(pred[,6]) #number is the column or specific term you want to produce plots for
+hist(pred.slope, main='All Slopes')
+max.t<-max(abs(pred.slope))
+
+par(mfrow=c(1,2))
+vis.gam(m2009, view=c("cent_lon", "cent_lat"), 
+        plot.type="contour", type="response", contour="black",
+        color="topo", n.grid=50, too.far=0.2,
+        main="", ylab="Latitude", xlab="Longitude")
+map("worldHires", fill=T, col="grey",add=T)
+
+
+
+plot(gam.dur.2009$cent_lon, gam.dur.2009$cent_lat, pch="", 
+     ylab="Latitude", xlab="Longitude")
+# vis.gam(la2b, view=c("cent_lon", "cent_lat"), 
+#         plot.type="contour", type="link", contour="black",
+#         color="gray", n.grid=50, too.far=0.5,
+#         main="", ylab="Latitude", xlab="Longitude")
+symbols(gam.dur.2009$cent_lon[pred.slope>=0],gam.dur.2009$cent_lat[pred.slope>=0],
+        circle=pred.slope[pred.slope>=0],inches=0.2*max(pred.slope[pred.slope>=0])/max.t,add=T,fg='blue')
+symbols(gam.dur.2009$cent_lon[pred.slope<=0],gam.dur.2009$cent_lat[pred.slope<=0],
+        circle=abs(pred.slope[pred.slope<=0]),inches=0.2*max(abs(pred.slope[pred.slope<=0]))/max.t,add=T,fg='red')
+map("worldHires", fill=T, col="grey",add=T)
+
+#########
+##2010###
+#########
+
+par(mfrow=c(2,3))
+plot(m2010, select=2, shade=T, all.terms=T, scale=0,
+     xlab="DO (mg/L)")
+plot(m2010, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+plot(m2010, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+plot(m2010, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Julian Day")
+
+#Get slope coefficients for gom2 model
+pred<-predict(m2010, type='terms')
+head(pred)
+pred.slope<-(pred[,6]) #number is the column or specific term you want to produce plots for
+hist(pred.slope, main='All Slopes')
+max.t<-max(abs(pred.slope))
+
+par(mfrow=c(1,2))
+vis.gam(m2010, view=c("cent_lon", "cent_lat"), 
+        plot.type="contour", type="response", contour="black",
+        color="topo", n.grid=50, too.far=0.2,
+        main="", ylab="Latitude", xlab="Longitude")
+map("worldHires", fill=T, col="grey",add=T)
+
+
+
+plot(gam.dur.2010$cent_lon, gam.dur.2010$cent_lat, pch="", 
+     ylab="Latitude", xlab="Longitude")
+# vis.gam(la2b, view=c("cent_lon", "cent_lat"), 
+#         plot.type="contour", type="link", contour="black",
+#         color="gray", n.grid=50, too.far=0.5,
+#         main="", ylab="Latitude", xlab="Longitude")
+symbols(gam.dur.2010$cent_lon[pred.slope>=0],gam.dur.2010$cent_lat[pred.slope>=0],
+        circle=pred.slope[pred.slope>=0],inches=0.2*max(pred.slope[pred.slope>=0])/max.t,add=T,fg='blue')
+symbols(gam.dur.2010$cent_lon[pred.slope<=0],gam.dur.2010$cent_lat[pred.slope<=0],
+        circle=abs(pred.slope[pred.slope<=0]),inches=0.2*max(abs(pred.slope[pred.slope<=0]))/max.t,add=T,fg='red')
+map("worldHires", fill=T, col="grey",add=T)
+
+#########
+##2011###
+#########
+
+par(mfrow=c(2,3))
+plot(m2011, select=2, shade=T, all.terms=T, scale=0,
+     xlab="DO (mg/L)")
+plot(m2011, select=3, shade=T, all.terms=T, scale=0,
+     xlab="Depth (m)")
+plot(m2011, select=4, shade=T, all.terms=T, scale=0,
+     xlab="Price per pound (USD)")
+plot(m2011, select=1, shade=T, all.terms=T, scale=0,
+     xlab="Julian Day")
+
+#Get slope coefficients for gom2 model
+pred<-predict(m2011, type='terms')
+head(pred)
+pred.slope<-(pred[,6]) #number is the column or specific term you want to produce plots for
+hist(pred.slope, main='All Slopes')
+max.t<-max(abs(pred.slope))
+
+par(mfrow=c(1,2))
+vis.gam(m2011, view=c("cent_lon", "cent_lat"), 
+        plot.type="contour", type="response", contour="black",
+        color="topo", n.grid=50, too.far=0.2,
+        main="", ylab="Latitude", xlab="Longitude")
+map("worldHires", fill=T, col="grey",add=T)
+
+
+
+plot(gam.dur.2011$cent_lon, gam.dur.2011$cent_lat, pch="", 
+     ylab="Latitude", xlab="Longitude")
+# vis.gam(la2b, view=c("cent_lon", "cent_lat"), 
+#         plot.type="contour", type="link", contour="black",
+#         color="gray", n.grid=50, too.far=0.5,
+#         main="", ylab="Latitude", xlab="Longitude")
+symbols(gam.dur.2011$cent_lon[pred.slope>=0],gam.dur.2011$cent_lat[pred.slope>=0],
+        circle=pred.slope[pred.slope>=0],inches=0.2*max(pred.slope[pred.slope>=0])/max.t,add=T,fg='blue')
+symbols(gam.dur.2011$cent_lon[pred.slope<=0],gam.dur.2011$cent_lat[pred.slope<=0],
+        circle=abs(pred.slope[pred.slope<=0]),inches=0.2*max(abs(pred.slope[pred.slope<=0]))/max.t,add=T,fg='red')
+map("worldHires", fill=T, col="grey",add=T)
+```
+
+
+Friday, 20 September 2013
+-------------------------
+
+As per JKC I need to make a:
+1. Table with number of tows and number of vessels by year (this would be a good table for the paper as well).
+2. Maps similar to the first figure of the paper, but that show some random subset of the ELB data (20%?) so you can see the spatial structure a little better
+3. Maps of the interpolated area of hypoxia by year (the raw interpolation and the smoothed interpolation) to show how we assigned the DO to tows. 
+
+
+
+### Table of tows and vessels for manuscript
+
+```{r}
+vms.dat=read.csv("C:/Users/kevin.purcell/Documents/NOAA_SpatialEffort_MS/analysis/vms_analysis/elbdata-20120911.csv", 
+                 sep=",",header=T)
+vms.20<-subset(vms.dat, vms.dat$towhours<=20)
+vms.20<-subset(vms.20, vms.20$mon>=5&vms.20$mon<=8)
+```
+
+Year|Vessels|Tows
+----|----|-------
+2004|`r length(unique(vms.20$boxId[vms.20$yr==2004]))`|`r length(vms.20$towhours[vms.20$yr==2004])`
+2005|`r length(unique(vms.20$boxId[vms.20$yr==2005]))`|`r length(vms.20$towhours[vms.20$yr==2005])`
+2006|`r length(unique(vms.20$boxId[vms.20$yr==2006]))`|`r length(vms.20$towhours[vms.20$yr==2006])`
+2007|`r length(unique(vms.20$boxId[vms.20$yr==2007]))`|`r length(vms.20$towhours[vms.20$yr==2007])`
+2008|`r length(unique(vms.20$boxId[vms.20$yr==2008]))`|`r length(vms.20$towhours[vms.20$yr==2008])`
+2009|`r length(unique(vms.20$boxId[vms.20$yr==2009]))`|`r length(vms.20$towhours[vms.20$yr==2009])`
+2010|`r length(unique(vms.20$boxId[vms.20$yr==2010]))`|`r length(vms.20$towhours[vms.20$yr==2010])`
+2011|`r length(unique(vms.20$boxId[vms.20$yr==2011]))`|`r length(vms.20$towhours[vms.20$yr==2011])`
+
+
+### New map with random subset of data
+```{r}
+#yearly data sets
+vms.2004<-subset(vms.20, vms.20$yr==2004)
+vms.2005<-subset(vms.20, vms.20$yr==2005)
+vms.2006<-subset(vms.20, vms.20$yr==2006)
+vms.2007<-subset(vms.20, vms.20$yr==2007)
+vms.2008<-subset(vms.20, vms.20$yr==2008)
+vms.2009<-subset(vms.20, vms.20$yr==2009)
+vms.2010<-subset(vms.20, vms.20$yr==2010)
+vms.2011<-subset(vms.20, vms.20$yr==2011)
+
+#random samples of those years
+rand.2004<-vms.2004[sample(1:nrow(vms.2004), 31, replace=F),]
+rand.2005<-vms.2005[sample(1:nrow(vms.2005), 121, replace=F),]
+rand.2006<-vms.2006[sample(1:nrow(vms.2006), 263, replace=F),]
+rand.2007<-vms.2007[sample(1:nrow(vms.2007), 417, replace=F),]
+rand.2008<-vms.2008[sample(1:nrow(vms.2008), 672, replace=F),]
+rand.2009<-vms.2009[sample(1:nrow(vms.2009), 798, replace=F),]
+rand.2010<-vms.2010[sample(1:nrow(vms.2010), 412, replace=F),]
+rand.2011<-vms.2011[sample(1:nrow(vms.2011), 596, replace=F),]
+
+#Draw maps
+par(mfrow=c(2,4))
+plot(rand.2004$slat ~ rand.2004$slon, col="lightskyblue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2004")
+map("worldHires", fill=T, col="green",add=T)
+plot(rand.2005$slat ~ rand.2005$slon, col="lightskyblue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2005")
+map("worldHires", fill=T, col="green",add=T)
+plot(rand.2006$slat ~ rand.2006$slon, col="lightskyblue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2006")
+map("worldHires", fill=T, col="green",add=T)
+plot(rand.2007$slat ~ rand.2007$slon, col="lightskyblue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2007")
+map("worldHires", fill=T, col="green",add=T)
+plot(rand.2008$slat ~ rand.2008$slon, col="lightskyblue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2008")
+map("worldHires", fill=T, col="green",add=T)
+plot(rand.2009$slat ~ rand.2009$slon, col="lightskyblue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2009")
+map("worldHires", fill=T, col="green",add=T)
+plot(rand.2010$slat ~ rand.2010$slon, col="lightskyblue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2010")
+map("worldHires", fill=T, col="green",add=T)
+plot(rand.2011$slat ~ rand.2011$slon, col="lightskyblue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2011")
+map("worldHires", fill=T, col="green",add=T)
+```
+
+```{r}
+
+#full sample maps
+par(mfrow=c(2,4))
+plot(vms.dat$slat[vms.dat$yr==2004] ~ vms.dat$slon[vms.dat$yr==2004], col="blue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2004")
+map("worldHires", fill=T, col="green",add=T)
+plot(vms.dat$slat[vms.dat$yr==2005] ~ vms.dat$slon[vms.dat$yr==2005], col="blue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2005")
+map("worldHires", fill=T, col="green",add=T)
+plot(vms.dat$slat[vms.dat$yr==2006] ~ vms.dat$slon[vms.dat$yr==2006], col="blue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2006")
+map("worldHires", fill=T, col="green",add=T)
+plot(vms.dat$slat[vms.dat$yr==2007] ~ vms.dat$slon[vms.dat$yr==2007], col="blue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2007")
+map("worldHires", fill=T, col="green",add=T)
+plot(vms.dat$slat[vms.dat$yr==2008] ~ vms.dat$slon[vms.dat$yr==2008], col="blue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2008")
+map("worldHires", fill=T, col="green",add=T)
+plot(vms.dat$slat[vms.dat$yr==2009] ~ vms.dat$slon[vms.dat$yr==2009], col="blue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2009")
+map("worldHires", fill=T, col="green",add=T)
+plot(vms.dat$slat[vms.dat$yr==2010] ~ vms.dat$slon[vms.dat$yr==2010], col="blue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2010")
+map("worldHires", fill=T, col="green",add=T)
+plot(vms.dat$slat[vms.dat$yr==2011] ~ vms.dat$slon[vms.dat$yr==2011], col="blue", pch=1,
+     xlim=c(-97.2,-88),
+     ylim=c(25.5,30.5),
+     xlab="Lon",
+     ylab="Lat",
+     main="2011")
+map("worldHires", fill=T, col="green",add=T)
+
+
+
