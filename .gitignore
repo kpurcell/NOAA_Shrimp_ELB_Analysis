@@ -213,3 +213,19 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+
+#############
+## Latex compile files
+#############
+*.aux
+*.bbl
+*.blg
+cache/*
+figure/*
+*.log
+*.pdf
+*.gz
+*.tex
+
+
+
