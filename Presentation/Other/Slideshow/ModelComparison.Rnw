@@ -1,9 +1,31 @@
-\documentclass{article}
+\documentclass{beamer}
 
 \begin{document}
 \SweaveOpts{concordance=TRUE}
 
+\title{Final Model Comparison}
+\author{KM Purcell}
 
+\maketitle
 
+\begin{frame}[fragile]
+You can test if \textbf{knitr} works with this minimal demo. OK, let's
+get started with some boring random numbers:
+
+<<>>=
+summary(m.2mo.dur.la)
+@
+\end{frame}
+
+\begin{frame}[fragile]
+The first element of \texttt{x} is \Sexpr{x[1]}. Boring boxplots
+and histograms recorded by the PDF device:
+
+<<boring-plots,dev=pdf,fig.width=5,fig.height=5,out.width=.45\linewidth,par=TRUE>>=
+## two plots side by side (option fig.show=hold)
+boxplot(x)
+hist(x,main='')
+@
+\end{frame}
 
 \end{document}

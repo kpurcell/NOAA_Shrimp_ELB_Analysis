@@ -20,10 +20,8 @@ m.1wk <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + s(depth) +
 Base model:
 - year as factor
 - fuel price (based on Los Angeles times series) is a parametric term
-- fishery effort (based on SHRCOM) is included as a parametric term
-- updated area of hypoxia estimates are a parametric term
-- do included in model as parametric term
-- smooths are depth, price per pound, julian dat and location
+- fishery effort (based on SHRCOM values) is included as a parametric term
+- smooths are depth, price per pound, julian day and location
 - variable coefficient term = location by do  
 
 
@@ -44,8 +42,8 @@ Base model:
 ## 
 ##                             k'    edf k-index p-value
 ## s(depth)                 9.000  2.742   0.856    0.00
-## s(ppnd)                  9.000  6.528   0.994    0.41
-## s(jd)                    9.000  2.271   0.993    0.40
+## s(ppnd)                  9.000  6.528   0.994    0.35
+## s(jd)                    9.000  2.271   0.993    0.38
 ## s(cent_lon,cent_lat)    29.000 19.606   0.908    0.00
 ## s(cent_lon,cent_lat):do 30.000  9.877   0.798    0.00
 ```
@@ -54,6 +52,15 @@ Base model:
 Model check looks fine.  
 
 
+
+```
+## 
+## Attaching package: 'xtable'
+## 
+## The following object is masked from 'package:maptools':
+## 
+##     label
+```
 
 ```
 ## 
@@ -95,7 +102,7 @@ Model check looks fine.
 
 One week model results:
 - 2006 and 2007 are not significant
-- Smooths for Julian day and Location by do were **not significant**
+- Smooths for Julian day and Location and location by do were **not significant**
 
 
 
@@ -135,9 +142,16 @@ Model slopes from the 1 week data set:
 
 
 ```r
-m.2mo.dur.la <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + s(depth) + 
-    s(ppnd) + s(jd) + s(cent_lon, cent_lat) + s(cent_lon, cent_lat, by = do), 
-    data = gam.2mo.dur.la)
+m.2mo.dur.la <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + areaOB + 
+    +s(depth) + s(ppnd) + s(jd) + s(cent_lon, cent_lat) + s(cent_lon, cent_lat, 
+    by = do), data = gam.2mo.dur.la)
+
+nspm.2mo.dur.la <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + 
+    s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon, cent_lat), data = gam.2mo.dur.la)
+
+aream.2mo.dur.la <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + 
+    areaOB + +s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon, cent_lat) + s(cent_lon, 
+    cent_lat, by = areaOB), data = gam.2mo.dur.la)
 ```
 
 
@@ -147,71 +161,39 @@ m.2mo.dur.la <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + s(dep
 ## 
 ## Method: GCV   Optimizer: magic
 ## Smoothing parameter selection converged after 16 iterations.
-## The RMS GCV score gradiant at convergence was 4.942e-07 .
+## The RMS GCV score gradiant at convergence was 4.946e-07 .
 ## The Hessian was positive definite.
-## The estimated model rank was 90 (maximum possible: 95)
+## The estimated model rank was 90 (maximum possible: 96)
 ## 
 ## Basis dimension (k) checking results. Low p-value (k-index<1) may
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
 ##                             k'    edf k-index p-value
-## s(depth)                 9.000  7.042   0.710    0.00
-## s(ppnd)                  9.000  6.262   0.993    0.33
-## s(jd)                    9.000  6.901   0.993    0.34
-## s(cent_lon,cent_lat)    29.000 27.714   0.932    0.00
-## s(cent_lon,cent_lat):do 30.000 26.718   0.859    0.00
+## s(depth)                 9.000  7.041   0.711    0.00
+## s(ppnd)                  9.000  6.262   0.976    0.05
+## s(jd)                    9.000  6.884   1.005    0.61
+## s(cent_lon,cent_lat)    29.000 27.714   0.925    0.00
+## s(cent_lon,cent_lat):do 30.000 26.717   0.860    0.00
 ```
 
 
-## model diagnostics look fine
+## model diagnostics look ok
 
 
 ```
-## 
-## Family: gaussian 
-## Link function: identity 
-## 
-## Formula:
-## log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + s(depth) + 
-##     s(ppnd) + s(jd) + s(cent_lon, cent_lat) + s(cent_lon, cent_lat, 
-##     by = do)
-## 
-## Parametric coefficients:
-##                 Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)     1.79e+00   1.21e-01   14.78  < 2e-16 ***
-## factor(yr)2005  1.71e-02   7.64e-02    0.22   0.8226    
-## factor(yr)2006  3.66e-01   6.35e-02    5.75  8.8e-09 ***
-## factor(yr)2007  5.41e-01   5.05e-02   10.71  < 2e-16 ***
-## factor(yr)2008  9.75e-01   8.41e-02   11.60  < 2e-16 ***
-## factor(yr)2009  8.24e-01   3.37e-02   24.45  < 2e-16 ***
-## factor(yr)2010  7.95e-01   2.75e-02   28.91  < 2e-16 ***
-## la_fuel_price  -1.12e-01   4.15e-02   -2.69   0.0071 ** 
-## hrs             2.24e-07   8.49e-08    2.63   0.0085 ** 
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Approximate significance of smooth terms:
-##                           edf Ref.df     F p-value    
-## s(depth)                 7.04   7.73 10.48 3.6e-14 ***
-## s(ppnd)                  6.26   7.22  2.59   0.011 *  
-## s(jd)                    6.90   7.64 13.36 < 2e-16 ***
-## s(cent_lon,cent_lat)    27.71  27.96 10.93 < 2e-16 ***
-## s(cent_lon,cent_lat):do 26.72  29.16  5.10 < 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## R-sq.(adj) =  0.149   Deviance explained = 15.3%
-## GCV score = 0.79247  Scale est. = 0.78937   n = 21102
+## Error: "align" must have length equal to 1 ( ncol(x) + 1 )
+```
+
+```
+## Error: object 'm.2mo.dur.la.table' not found
 ```
 
 
 
 Louisiana model results (6 week integration):
-- most years significant **except** 2008
-- fishery effort **not significant**
-- both area of hypoxia and do were significant
-- all smooths were significant  
-
+- most years significant **except** 2005
+- all smooths are significant  
+- deviance explained is 15.3%
 
 
 
@@ -225,6 +207,10 @@ The slopes are both positive and negative.
 <img src="figure/unnamed-chunk-14.png" title="plot of chunk unnamed-chunk-14" alt="plot of chunk unnamed-chunk-14" style="display: block; margin: auto;" />
 
 
+<img src="figure/unnamed-chunk-15.png" title="plot of chunk unnamed-chunk-15" alt="plot of chunk unnamed-chunk-15" style="display: block; margin: auto;" />
+
+
+
 ## Texas base model with 6 week data integration
 
 
@@ -232,13 +218,20 @@ The slopes are both positive and negative.
 
 
 ```r
-m.2mo.dur.tx <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + +s(depth) + 
+m.2mo.dur.tx <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + s(depth) + 
     s(ppnd) + s(jd) + s(cent_lon, cent_lat) + s(cent_lon, cent_lat, by = do), 
     data = gam.2mo.dur.tx)
+
+nspm.2mo.dur.tx <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + 
+    s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon, cent_lat), data = gam.2mo.dur.tx)
+
+aream.2mo.dur.tx <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + 
+    areaOB + +s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon, cent_lat) + s(cent_lon, 
+    cent_lat, by = areaOB), data = gam.2mo.dur.tx)
 ```
 
 
-<img src="figure/unnamed-chunk-17.png" title="plot of chunk unnamed-chunk-17" alt="plot of chunk unnamed-chunk-17" style="display: block; margin: auto;" />
+<img src="figure/unnamed-chunk-18.png" title="plot of chunk unnamed-chunk-18" alt="plot of chunk unnamed-chunk-18" style="display: block; margin: auto;" />
 
 ```
 ## 
@@ -253,11 +246,11 @@ m.2mo.dur.tx <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + +s(de
 ## indicate that k is too low, especially if edf is close to k'.
 ## 
 ##                             k'    edf k-index p-value
-## s(depth)                 9.000  6.223   0.731    0.00
-## s(ppnd)                  9.000  6.987   0.983    0.11
-## s(jd)                    9.000  7.839   0.987    0.15
-## s(cent_lon,cent_lat)    29.000 24.405   0.987    0.15
-## s(cent_lon,cent_lat):do 30.000 22.499   0.920    0.00
+## s(depth)                 9.000  6.223   0.742    0.00
+## s(ppnd)                  9.000  6.987   0.978    0.06
+## s(jd)                    9.000  7.839   0.990    0.21
+## s(cent_lon,cent_lat)    29.000 24.405   0.976    0.02
+## s(cent_lon,cent_lat):do 30.000 22.499   0.898    0.00
 ```
 
 
@@ -268,7 +261,7 @@ m.2mo.dur.tx <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + +s(de
 ## Link function: identity 
 ## 
 ## Formula:
-## log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + +s(depth) + 
+## log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + s(depth) + 
 ##     s(ppnd) + s(jd) + s(cent_lon, cent_lat) + s(cent_lon, cent_lat, 
 ##     by = do)
 ## 
@@ -302,15 +295,30 @@ m.2mo.dur.tx <- gam(log(towhours + 1) ~ factor(yr) + la_fuel_price + hrs + +s(de
 
 
 
+```
+## Error: subscript out of bounds
+```
 
+```
+## Error: subscript out of bounds
+```
 
-<img src="figure/unnamed-chunk-20.png" title="plot of chunk unnamed-chunk-20" alt="plot of chunk unnamed-chunk-20" style="display: block; margin: auto;" />
+```
+## Error: subscript out of bounds
+```
+
+```
+## Error: subscript out of bounds
+```
 
 
 <img src="figure/unnamed-chunk-21.png" title="plot of chunk unnamed-chunk-21" alt="plot of chunk unnamed-chunk-21" style="display: block; margin: auto;" />
 
 
-### Added 11-21-2013
+<img src="figure/unnamed-chunk-22.png" title="plot of chunk unnamed-chunk-22" alt="plot of chunk unnamed-chunk-22" style="display: block; margin: auto;" />
+
+
+### Secondary Response variables
 
 
 
@@ -371,10 +379,10 @@ summary(m.2mo.tow.count.la)
 
 
 
-<img src="figure/unnamed-chunk-26.png" title="plot of chunk unnamed-chunk-26" alt="plot of chunk unnamed-chunk-26" style="display: block; margin: auto;" />
-
-
 <img src="figure/unnamed-chunk-27.png" title="plot of chunk unnamed-chunk-27" alt="plot of chunk unnamed-chunk-27" style="display: block; margin: auto;" />
+
+
+<img src="figure/unnamed-chunk-28.png" title="plot of chunk unnamed-chunk-28" alt="plot of chunk unnamed-chunk-28" style="display: block; margin: auto;" />
 
 
 
@@ -428,11 +436,11 @@ m.2mo.tow.count.tx <- gam(tow.cnt ~ factor(yr) + la_fuel_price + hrs + s(depth) 
 ```
 
 
-<img src="figure/unnamed-chunk-31.png" title="plot of chunk unnamed-chunk-31" alt="plot of chunk unnamed-chunk-31" style="display: block; margin: auto;" />
-
-
-
 <img src="figure/unnamed-chunk-32.png" title="plot of chunk unnamed-chunk-32" alt="plot of chunk unnamed-chunk-32" style="display: block; margin: auto;" />
+
+
+
+<img src="figure/unnamed-chunk-33.png" title="plot of chunk unnamed-chunk-33" alt="plot of chunk unnamed-chunk-33" style="display: block; margin: auto;" />
 
 
 
@@ -485,10 +493,10 @@ summary(m.2mo.avg.dur.la)
 ```
 
 
-<img src="figure/unnamed-chunk-35.png" title="plot of chunk unnamed-chunk-35" alt="plot of chunk unnamed-chunk-35" style="display: block; margin: auto;" />
-
-
 <img src="figure/unnamed-chunk-36.png" title="plot of chunk unnamed-chunk-36" alt="plot of chunk unnamed-chunk-36" style="display: block; margin: auto;" />
+
+
+<img src="figure/unnamed-chunk-37.png" title="plot of chunk unnamed-chunk-37" alt="plot of chunk unnamed-chunk-37" style="display: block; margin: auto;" />
 
 
 
@@ -542,10 +550,10 @@ summary(m.2mo.avg.dur.tx)
 
 
 
-<img src="figure/unnamed-chunk-39.png" title="plot of chunk unnamed-chunk-39" alt="plot of chunk unnamed-chunk-39" style="display: block; margin: auto;" />
-
-
 <img src="figure/unnamed-chunk-40.png" title="plot of chunk unnamed-chunk-40" alt="plot of chunk unnamed-chunk-40" style="display: block; margin: auto;" />
+
+
+<img src="figure/unnamed-chunk-41.png" title="plot of chunk unnamed-chunk-41" alt="plot of chunk unnamed-chunk-41" style="display: block; margin: auto;" />
 
 
 Model effects for the Average Duration model
