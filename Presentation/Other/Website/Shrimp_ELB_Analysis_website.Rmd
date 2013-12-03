@@ -47,12 +47,6 @@ gam.check(m.1wk)
 Model check looks fine.  
 
 
-```{r echo=FALSE}
-library(xtable)
-
-summary(m.1wk)
-```
-
 One week model results:
 - 2006 and 2007 are not significant
 - Smooths for Julian day and Location and location by do were **not significant**
