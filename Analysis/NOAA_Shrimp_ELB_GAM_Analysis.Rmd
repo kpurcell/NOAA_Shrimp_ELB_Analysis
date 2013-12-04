@@ -182,6 +182,6 @@ Model effects for the Average Duration model
 ```{r}
 sessionInfo()
 save.image(file=paste(Sys.Date(), ".RData", sep=""))
-```
+gi```
 
 
