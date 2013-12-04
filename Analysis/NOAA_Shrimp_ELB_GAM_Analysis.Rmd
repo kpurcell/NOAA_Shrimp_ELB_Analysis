@@ -47,52 +47,18 @@ nspm.2mo.dur.la<-gam(log(towhours+1) ~ factor(yr) + la_fuel_price  + hrs
 gam.check(m.2mo.dur.la)
 ```
 
-## model diagnostics look ok
+### model diagnostics look ok
 
 ```{r LAnspSummary, echo=FALSE}
 summary(nspm.2mo.dur.la)
 ```
-## LA non-spatial model results
+### LA non-spatial model results
 
 ```{r LAspSummary, echo=FALSE}
 summary(m.2mo.dur.la)
 ```
 
-## LA Spatial model results
-
-
-
-
-
-The distribution of slopes for the coast of louisiana are heterogeneous and irregularly spread across the coast.  Area
-
-
-
-```{r echo=FALSE, fig.align='center', fig.width=10, fig.height=10}
-windows(width=12,height=10,record=T)
-par(mfrow=c(2,1))
-vis.gam(m.2mo.dur.la, view=c("cent_lon", "cent_lat"), 
-        plot.type="contour", type="response", contour="black", cond=list(areaOB=7100),
-        color="gray", n.grid=50, too.far=0.2,
-        main="2009 = 7100 km^2 & 132902.06 hrs", ylab="Latitude", xlab="Longitude")
-map("worldHires", fill=T, col="grey",add=T)
-vis.gam(m.2mo.dur.la, view=c("cent_lon", "cent_lat"), 
-        plot.type="contour", type="response", contour="black", cond=list(areaOB=22300),
-        color="gray", n.grid=50, too.far=0.2,
-        main="2008 = 22300 km^2 & 106886.31 hrs", ylab="Latitude", xlab="Longitude")
-map("worldHires", fill=T, col="grey",add=T)
-
-
-symbols(gam.2mo.dur.la$cent_lon[sign.slope.pos.do],gam.2mo.dur.la$cent_lat[sign.slope.pos.do],
-        circle=pred.slope.do[sign.slope.pos.do],
-        inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,
-        add=T,fg='white',bg='white')
-symbols(gam.2mo.dur.la$cent_lon[sign.slope.neg.do],gam.2mo.dur.la$cent_lat[sign.slope.neg.do],
-        circle=abs(pred.slope.do[sign.slope.neg.do]),
-        inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,
-        add=T,fg='blue',bg='blue')
-map("worldHires", fill=T, col="grey",add=T)
-```
+### LA Spatial model results
 
 
 ## Texas base model with 6 week data integration
@@ -124,7 +90,7 @@ summary(m.2mo.dur.tx)
 ```
 
 
-### Secondary Response variables
+## Secondary Response variables
 
 ```{r echo=FALSE}
 #####################################
@@ -140,11 +106,13 @@ m.2mo.tow.count.la<-gam(tow.cnt ~ factor(yr) + la_fuel_price  + hrs
                   data=gam.2mo.tow.count.la)
 ```
 
+```{r}
 gam.check(m.2mo.tow.count.la)
+```
+
 ```{r}
 summary(m.2mo.tow.count.la)
 ```
-
 
 
 
@@ -154,6 +122,7 @@ summary(m.2mo.tow.count.la)
 gam.2mo.tow.count.tx<-gam.2mo.tow.count.tx[,c("yr","jd","hrs","do","depth", "ppnd", "la_fuel_price","tow.cnt","cent_lon","cent_lat")]    
 gam.2mo.tow.count.tx<-na.omit(gam.2mo.tow.count.tx)
 ```
+
 
 ```{r echo=TRUE}
 m.2mo.tow.count.tx<-gam(tow.cnt ~ factor(yr) + la_fuel_price  + hrs   

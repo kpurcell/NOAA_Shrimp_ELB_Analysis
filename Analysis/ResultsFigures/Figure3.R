@@ -8,6 +8,7 @@
 # TODO -> add letters, add symbol scale, standardize surface contour colors
 #         add code for pdf creation
 ###########################################################
+windows(width=15,height=15,record=T)
 par(mfrow=c(2,2))
 ## Average tow duration
 
