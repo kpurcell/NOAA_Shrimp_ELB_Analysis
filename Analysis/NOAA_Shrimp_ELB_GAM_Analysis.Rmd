@@ -12,9 +12,10 @@ The first chunk runs several scripts that gather the data from several files and
 
 
 ```{r DataImport, echo=FALSE, results='hide', message=FALSE}
-source("C:\\Users\\Kevin.Purcell\\Documents\\NOAA_Shrimp_ELB_Analysis\\Data\\GatherSource\\gatherData.R")
-source("C:\\Users\\Kevin.Purcell\\Documents\\NOAA_Shrimp_ELB_Analysis\\Data\\merge2moData.R")
-source("C:\\Users\\Kevin.Purcell\\Documents\\NOAA_Shrimp_ELB_Analysis\\Data\\merge1wkData.R")
+setwd("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis")
+source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Data\\GatherSource\\gatherData.R")
+source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Data\\merge2moData.R")
+source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Data\\merge1wkData.R")
 
 # Dependent packages
 library(mgcv)
@@ -180,9 +181,7 @@ Model effects for the Average Duration model
 
 ```{r}
 sessionInfo()
-
-#TODOs
-# add sessioninfo() statement
-# save RDATA file
+save.image(file=paste(Sys.Date(), ".RData", sep=""))
+```
 
 
