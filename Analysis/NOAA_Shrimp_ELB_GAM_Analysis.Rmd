@@ -26,12 +26,12 @@ library(mapdata)
 
 ## Louisiana base model with 6 week data integration
 
-```{r echo=FALSE}
+```{r LAmodelinput, echo=FALSE}
 gam.2mo.dur.la<-gam.2mo.dur.la[,c("yr","jd","hrs","do","depth", "ppnd", "la_fuel_price","towhours","areaOB","cent_lon","cent_lat")]    
 gam.2mo.dur.la<-na.omit(gam.2mo.dur.la)
 ```
 
-```{r echo=TRUE}
+```{r LAmodels, echo=TRUE}
 m.2mo.dur.la<-gam(log(towhours+1) ~ factor(yr) + la_fuel_price + hrs +
                   + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
                   s(cent_lon,cent_lat, by=do),
@@ -43,21 +43,23 @@ nspm.2mo.dur.la<-gam(log(towhours+1) ~ factor(yr) + la_fuel_price  + hrs
 
 ```
 
-```{r echo=FALSE, fig.align='center'}
+```{r echo=FALSE, fig.align='center', fig.keep='none'}
 gam.check(m.2mo.dur.la)
 ```
 
 ## model diagnostics look ok
 
-```{r echo=FALSE}
+```{r LAnspSummary, echo=FALSE}
+summary(nspm.2mo.dur.la)
+```
+## LA non-spatial model results
+
+```{r LAspSummary, echo=FALSE}
 summary(m.2mo.dur.la)
 ```
 
+## LA Spatial model results
 
-Louisiana model results (6 week integration):
-- most years significant **except** 2005
-- all smooths are significant  
-- deviance explained is 15.3%
 
 
 ```{r echo=FALSE}
@@ -141,12 +143,13 @@ map("worldHires", fill=T, col="grey",add=T)
 
 ## Texas base model with 6 week data integration
 
-```{r echo=FALSE}
+```{r TXmodelInput, echo=FALSE}
 gam.2mo.dur.tx<-gam.2mo.dur.tx[,c("yr","jd","hrs","do","depth", "ppnd", "la_fuel_price","towhours","areaOB","cent_lon","cent_lat")]    
 gam.2mo.dur.tx<-na.omit(gam.2mo.dur.tx)
 ```
 
-```{r echo=TRUE}
+
+```{r TXmodels, echo=TRUE}
 m.2mo.dur.tx<-gam(log(towhours+1) ~ factor(yr) + la_fuel_price  + hrs 
                   + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
                   s(cent_lon,cent_lat, by=do),
@@ -155,11 +158,8 @@ m.2mo.dur.tx<-gam(log(towhours+1) ~ factor(yr) + la_fuel_price  + hrs
 nspm.2mo.dur.tx<-gam(log(towhours+1) ~ factor(yr) + la_fuel_price  + hrs 
                      + s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat),
                      data=gam.2mo.dur.tx)
-
-aream.2mo.dur.tx<-gam(log(towhours+1) ~ factor(yr) + la_fuel_price  + hrs + areaOB +
-                      + s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) 
-                      + s(cent_lon,cent_lat, by=areaOB), data=gam.2mo.dur.tx)
 ```
+
 
 ```{r echo=FALSE, fig.align='center'}
 gam.check(m.2mo.dur.tx)
