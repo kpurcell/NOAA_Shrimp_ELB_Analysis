@@ -4,7 +4,9 @@ Kevin Purcell
 updated: 2013-12-4
 
 
-This program runs the analysis for the Shrimp ELB analysis in a literate framework.  It was developed as a note.  Data sources and inputs?  
+This program runs the analysis for the Shrimp ELB analysis in a literate framework.  It was developed as a method to compare models and visualize them with JKC.  It is not being converted to an analysis script with a literate component.  
+
+Data sources and inputs?  
 
 The first chunk runs several scripts that gather the data from several files and formats.  In addition these scripts merge both the 1 week and 2 week data sets for examination with regression models.  This script depends on several packages which are also loaded in this chunk 1, see the ```sessionInfo()``` output for more details.  
 
