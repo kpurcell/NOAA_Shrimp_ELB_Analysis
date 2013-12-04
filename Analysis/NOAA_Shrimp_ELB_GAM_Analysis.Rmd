@@ -62,53 +62,7 @@ summary(m.2mo.dur.la)
 
 
 
-```{r echo=FALSE}
-#Get slope coefficients for gom2 model
-pred<-predict(m.2mo.dur.la, type='terms', se.fit=T)
-pred.slope.do<-pred[[1]][,8]/gam.2mo.dur.la$do #number is the column or specific term you want to produce plots for
-pred.slope.se.do<-1.96*pred[[2]][,8]/gam.2mo.dur.la$do
-pred.slope.up.do<-(pred[[1]][,8]+pred.slope.se.do)/gam.2mo.dur.la$do
-pred.slope.low.do<-(pred[[1]][,8]-pred.slope.se.do)/gam.2mo.dur.la$do
-sign.slope.pos.do<-(1:length(pred.slope.do))[pred.slope.low.do>0]
-sign.slope.neg.do<-(1:length(pred.slope.do))[pred.slope.up.do<0]
-max.do<-max(abs(pred.slope.do))
-```
 
-```{r echo=FALSE, fig.align='center'}
-par(mfrow=c(2,2))
-hist(pred.slope.do, main='All slopes, do')
-hist(pred.slope.se.do, main='Standard error, do')
-hist(pred.slope.do[sign.slope.pos.do], main='Significantly positive, do')
-hist(pred.slope.do[sign.slope.neg.do], main='Significantly negative, do')
-```
-
-The slopes are both positive and negative.  
-
-```{r echo=FALSE, fig.align='center', fig.width=10, fig.height=10}
-par(mfrow=c(2,2))
-plot(m.2mo.dur.la, select=1, shade=T, all.terms=T, scale=0,
-     xlab="Depth (m)")
-text(3, -2, "B", cex=1.5,font=2)
-plot(m.2mo.dur.la, select=2, shade=T, all.terms=T, scale=0,
-     xlab="Price per pound (USD)")
-text(0.4, -0.6, "C", cex=1.5,font=2)
-plot(m.2mo.dur.la, select=3, shade=T, all.terms=T, scale=0,
-     xlab="Julian Day")
-text(0.4, -0.6, "C", cex=1.5,font=2)
-vis.gam(m.2mo.dur.la, view=c("cent_lon", "cent_lat"), 
-        plot.type="contour", type="response", contour="black",
-        color="gray", n.grid=50, too.far=0.2,
-        main="", ylab="Latitude", xlab="Longitude")
-symbols(gam.2mo.dur.la$cent_lon[sign.slope.pos.do],gam.2mo.dur.la$cent_lat[sign.slope.pos.do],
-        circle=pred.slope.do[sign.slope.pos.do],
-        inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,
-        add=T,fg='white',bg='white')
-symbols(gam.2mo.dur.la$cent_lon[sign.slope.neg.do],gam.2mo.dur.la$cent_lat[sign.slope.neg.do],
-        circle=abs(pred.slope.do[sign.slope.neg.do]),
-        inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,
-        add=T,fg='blue',bg='blue')
-map("worldHires", fill=T, col="grey",add=T)
-```
 
 The distribution of slopes for the coast of louisiana are heterogeneous and irregularly spread across the coast.  Area
 
@@ -169,51 +123,6 @@ gam.check(m.2mo.dur.tx)
 summary(m.2mo.dur.tx)
 ```
 
-```{r echo=FALSE}
-#Get slope coefficients for gom2 model
-pred<-predict(m.2mo.dur.tx, type='terms', se.fit=T)
-pred.slope.do<-pred[[1]][,10]/gam.2mo.dur.tx$do #number is the column or specific term you want to produce plots for
-pred.slope.se.do<-1.96*pred[[2]][,10]/gam.2mo.dur.tx$do
-pred.slope.up.do<-(pred[[1]][,10]+pred.slope.se.do)/gam.2mo.dur.tx$do
-pred.slope.low.do<-(pred[[1]][,10]-pred.slope.se.do)/gam.2mo.dur.tx$do
-sign.slope.pos.do<-(1:length(pred.slope.do))[pred.slope.low.do>0]
-sign.slope.neg.do<-(1:length(pred.slope.do))[pred.slope.up.do<0]
-max.do<-max(abs(pred.slope.do))
-```
-
-```{r echo=FALSE, fig.align='center'}
-par(mfrow=c(2,2))
-hist(pred.slope.do, main='All slopes, do')
-hist(pred.slope.se.do, main='Standard error, do')
-hist(pred.slope.do[sign.slope.pos.do], main='Significantly positive, do')
-hist(pred.slope.do[sign.slope.neg.do], main='Significantly negative, do')
-```
-
-```{r echo=FALSE, fig.align='center', fig.width=10, fig.height=10}
-
-par(mfrow=c(2,2))
-#plot(m.2mo.dur.tx, select=1, shade=T, all.terms=T, scale=0,
-#     xlab="Dissolved Oxygen (mg/L) ")
-#text(.4, -0.72, "A", cex=1.5,font=2)
-plot(m.2mo.dur.tx, select=1, shade=T, all.terms=T, scale=0,
-     xlab="Depth (m) ")
-text(3, -2, "B", cex=1.5,font=2)
-plot(m.2mo.dur.tx, select=2, shade=T, all.terms=T, scale=0,
-     xlab="Price per pound (USD) Julian Day")
-text(0.4, -0.6, "C", cex=1.5,font=2)
-plot(m.2mo.dur.tx, select=3, shade=T, all.terms=T, scale=0,
-     xlab="Julian Day")
-text(0.4, -0.6, "C", cex=1.5,font=2)
-vis.gam(m.2mo.dur.tx, view=c("cent_lon", "cent_lat"), 
-        plot.type="contour", type="response", contour="black",
-        color="gray", n.grid=50, too.far=0.4,
-        main="", ylab="Latitude", xlab="Longitude")
-symbols(gam.2mo.dur.tx$cent_lon[sign.slope.pos.do],gam.2mo.dur.tx$cent_lat[sign.slope.pos.do],
-        circle=pred.slope.do[sign.slope.pos.do],inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,add=T,fg='white',bg='white')
-symbols(gam.2mo.dur.tx$cent_lon[sign.slope.neg.do],gam.2mo.dur.tx$cent_lat[sign.slope.neg.do],
-        circle=abs(pred.slope.do[sign.slope.neg.do]),inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,add=T,fg='blue',bg='blue')
-map("worldHires", fill=T, col="grey",add=T)
-```
 
 ### Secondary Response variables
 
@@ -237,50 +146,7 @@ summary(m.2mo.tow.count.la)
 ```
 
 
-```{r echo=FALSE}
-#Get slope coefficients for gom2 model
-pred<-predict(m.2mo.tow.count.la, type='terms', se.fit=T)
-pred.slope.do<-pred[[1]][,8]/gam.2mo.tow.count.la$do #number is the column or specific term you want to produce plots for
-pred.slope.se.do<-1.96*pred[[2]][,8]/gam.2mo.tow.count.la$do
-pred.slope.up.do<-(pred[[1]][,8]+pred.slope.se.do)/gam.2mo.tow.count.la$do
-pred.slope.low.do<-(pred[[1]][,8]-pred.slope.se.do)/gam.2mo.tow.count.la$do
-sign.slope.pos.do<-(1:length(pred.slope.do))[pred.slope.low.do>0]
-sign.slope.neg.do<-(1:length(pred.slope.do))[pred.slope.up.do<0]
-```
 
-```{r echo=FALSE, fig.align='center'}
-par(mfrow=c(2,2))
-hist(pred.slope.do, main='All slopes, do')
-hist(pred.slope.se.do, main='Standard error, do')
-hist(pred.slope.do[sign.slope.pos.do], main='Significantly positive, do')
-hist(pred.slope.do[sign.slope.neg.do], main='Significantly negative, do')
-
-max.do<-max(abs(pred.slope.do))
-```
-
-```{r echo=FALSE, fig.align='center', fig.width=10, fig.height=10}
-#windows(width=12,height=8,record=T)
-par(mfrow=c(2,2))
-plot(m.2mo.tow.count.la, select=1, shade=T, all.terms=T, scale=0,
-     xlab="Depth (m)")
-text(.4, -0.72, "A", cex=1.5,font=2)
-plot(m.2mo.tow.count.la, select=2, shade=T, all.terms=T, scale=0,
-     xlab="Price per pound (USD)")
-text(3, -2, "B", cex=1.5,font=2)
-plot(m.2mo.tow.count.la, select=3, shade=T, all.terms=T, scale=0,
-     xlab="Julian Day")
-text(0.4, -0.6, "C", cex=1.5,font=2)
-
-vis.gam(m.2mo.tow.count.la, view=c("cent_lon", "cent_lat"), 
-        plot.type="contour", type="response", contour="black",
-        color="gray", n.grid=50, too.far=0.4,
-        main="", ylab="Latitude", xlab="Longitude")
-symbols(gam.2mo.tow.count.la$cent_lon[sign.slope.pos.do],gam.2mo.tow.count.la$cent_lat[sign.slope.pos.do],
-        circle=pred.slope.do[sign.slope.pos.do],inches=0.2*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,add=T,fg='white',bg='white')
-symbols(gam.2mo.tow.count.la$cent_lon[sign.slope.neg.do],gam.2mo.tow.count.la$cent_lat[sign.slope.neg.do],
-        circle=abs(pred.slope.do[sign.slope.neg.do]),inches=0.2*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,add=T,fg='blue',bg='blue')
-map("worldHires", fill=T, col="grey",add=T)
-```
 
 ```{r echo=FALSE}
 #########################################
@@ -301,50 +167,7 @@ m.2mo.tow.count.tx<-gam(tow.cnt ~ factor(yr) + la_fuel_price  + hrs
 summary(m.2mo.tow.count.tx)
 ```
 
-```{r echo=FALSE, fig.align='center'}
-#Get slope coefficients for gom2 model
-pred<-predict(m.2mo.tow.count.tx, type='terms', se.fit=T)
-pred.slope.do<-pred[[1]][,8]/gam.2mo.tow.count.tx$do #number is the column or specific term you want to produce plots for
-pred.slope.se.do<-1.96*pred[[2]][,8]/gam.2mo.tow.count.tx$do
-pred.slope.up.do<-(pred[[1]][,8]+pred.slope.se.do)/gam.2mo.tow.count.tx$do
-pred.slope.low.do<-(pred[[1]][,8]-pred.slope.se.do)/gam.2mo.tow.count.tx$do
-sign.slope.pos.do<-(1:length(pred.slope.do))[pred.slope.low.do>0]
-sign.slope.neg.do<-(1:length(pred.slope.do))[pred.slope.up.do<0]
 
-
-par(mfrow=c(2,2))
-hist(pred.slope.do, main='All slopes, do')
-hist(pred.slope.se.do, main='Standard error, do')
-hist(pred.slope.do[sign.slope.pos.do], main='Significantly positive, do')
-hist(pred.slope.do[sign.slope.neg.do], main='Significantly negative, do')
-
-max.do<-max(abs(pred.slope.do))
-```
-
-
-```{r echo=FALSE, fig.align='center', fig.width=10, fig.height=10}
-#windows(width=12,height=8,record=T)
-par(mfrow=c(2,2))
-plot(m.2mo.tow.count.tx, select=1, shade=T, all.terms=T, scale=0,
-     xlab="Depth (m)")
-text(.4, -0.72, "A", cex=1.5,font=2)
-plot(m.2mo.tow.count.tx, select=2, shade=T, all.terms=T, scale=0,
-     xlab="Price per pound (USD)")
-text(3, -2, "B", cex=1.5,font=2)
-plot(m.2mo.tow.count.tx, select=3, shade=T, all.terms=T, scale=0,
-     xlab="Julian Day")
-text(0.4, -0.6, "C", cex=1.5,font=2)
-
-vis.gam(m.2mo.tow.count.tx, view=c("cent_lon", "cent_lat"), 
-        plot.type="contour", type="response", contour="black",
-        color="gray", n.grid=50, too.far=0.4,
-        main="", ylab="Latitude", xlab="Longitude")
-symbols(gam.2mo.tow.count.tx$cent_lon[sign.slope.pos.do],gam.2mo.tow.count.tx$cent_lat[sign.slope.pos.do],
-        circle=pred.slope.do[sign.slope.pos.do],inches=0.2*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,add=T,fg='white',bg='white')
-symbols(gam.2mo.tow.count.tx$cent_lon[sign.slope.neg.do],gam.2mo.tow.count.tx$cent_lat[sign.slope.neg.do],
-        circle=abs(pred.slope.do[sign.slope.neg.do]),inches=0.2*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,add=T,fg='blue',bg='blue')
-map("worldHires", fill=T, col="grey",add=T)
-```
 
 ```{r echo=FALSE}
 #############################################
@@ -362,49 +185,7 @@ summary(m.2mo.avg.dur.la)
 
 ```
 
-```{r echo=FALSE, fig.align='center'}
-#Get slope coefficients for gom2 model
-pred<-predict(m.2mo.avg.dur.la, type='terms', se.fit=T)
-pred.slope.do<-pred[[1]][,8]/gam.2mo.avg.dur.la$do #number is the column or specific term you want to produce plots for
-pred.slope.se.do<-1.96*pred[[2]][,8]/gam.2mo.avg.dur.la$do
-pred.slope.up.do<-(pred[[1]][,8]+pred.slope.se.do)/gam.2mo.avg.dur.la$do
-pred.slope.low.do<-(pred[[1]][,8]-pred.slope.se.do)/gam.2mo.avg.dur.la$do
-sign.slope.pos.do<-(1:length(pred.slope.do))[pred.slope.low.do>0]
-sign.slope.neg.do<-(1:length(pred.slope.do))[pred.slope.up.do<0]
 
-
-par(mfrow=c(2,2))
-hist(pred.slope.do, main='All slopes, do')
-hist(pred.slope.se.do, main='Standard error, do')
-hist(pred.slope.do[sign.slope.pos.do], main='Significantly positive, do')
-hist(pred.slope.do[sign.slope.neg.do], main='Significantly negative, do')
-
-max.do<-max(abs(pred.slope.do))
-```
-
-```{r echo=FALSE, fig.align='center', fig.width=10, fig.height=10}
-#windows(width=12,height=8,record=T)
-par(mfrow=c(2,2))
-plot(m.2mo.avg.dur.la, select=1, shade=T, all.terms=T, scale=0,
-     xlab="Depth (m)")
-text(.4, -0.72, "A", cex=1.5,font=2)
-plot(m.2mo.avg.dur.la, select=2, shade=T, all.terms=T, scale=0,
-     xlab="Price per pound (USD)")
-text(3, -2, "B", cex=1.5,font=2)
-plot(m.2mo.avg.dur.la, select=3, shade=T, all.terms=T, scale=0,
-     xlab="Julian Day")
-text(0.4, -0.6, "C", cex=1.5,font=2)
-
-vis.gam(m.2mo.avg.dur.la, view=c("cent_lon", "cent_lat"), 
-        plot.type="contour", type="response", contour="black",
-        color="gray", n.grid=50, too.far=0.4,
-        main="", ylab="Latitude", xlab="Longitude")
-symbols(gam.2mo.avg.dur.la$cent_lon[sign.slope.pos.do],gam.2mo.avg.dur.la$cent_lat[sign.slope.pos.do],
-        circle=pred.slope.do[sign.slope.pos.do],inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,add=T,fg='white',bg='white')
-symbols(gam.2mo.avg.dur.la$cent_lon[sign.slope.neg.do],gam.2mo.avg.dur.la$cent_lat[sign.slope.neg.do],
-        circle=abs(pred.slope.do[sign.slope.neg.do]),inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,add=T,fg='blue',bg='blue')
-map("worldHires", fill=T, col="grey",add=T)
-```
 
 ```{r echo=FALSE}
 ######################################
@@ -423,49 +204,7 @@ summary(m.2mo.avg.dur.tx)
 ```
 
 
-```{r echo=FALSE, fig.align='center'}
-#Get slope coefficients for gom2 model
-pred<-predict(m.2mo.avg.dur.tx, type='terms', se.fit=T)
-pred.slope.do<-pred[[1]][,8]/gam.2mo.avg.dur.tx$do #number is the column or specific term you want to produce plots for
-pred.slope.se.do<-1.96*pred[[2]][,8]/gam.2mo.avg.dur.tx$do
-pred.slope.up.do<-(pred[[1]][,8]+pred.slope.se.do)/gam.2mo.avg.dur.tx$do
-pred.slope.low.do<-(pred[[1]][,8]-pred.slope.se.do)/gam.2mo.avg.dur.tx$do
-sign.slope.pos.do<-(1:length(pred.slope.do))[pred.slope.low.do>0]
-sign.slope.neg.do<-(1:length(pred.slope.do))[pred.slope.up.do<0]
 
-
-par(mfrow=c(2,2))
-hist(pred.slope.do, main='All slopes, do')
-hist(pred.slope.se.do, main='Standard error, do')
-hist(pred.slope.do[sign.slope.pos.do], main='Significantly positive, do')
-hist(pred.slope.do[sign.slope.neg.do], main='Significantly negative, do')
-
-max.do<-max(abs(pred.slope.do))
-```
-
-```{r echo=FALSE, fig.align='center', fig.width=10, fig.height=10}
-#windows(width=12,height=8,record=T)
-par(mfrow=c(2,2))
-plot(m.2mo.avg.dur.tx, select=1, shade=T, all.terms=T, scale=0,
-     xlab="Depth (m)")
-text(.4, -0.72, "A", cex=1.5,font=2)
-plot(m.2mo.avg.dur.tx, select=2, shade=T, all.terms=T, scale=0,
-     xlab="Price per pound (USD)")
-text(3, -2, "B", cex=1.5,font=2)
-plot(m.2mo.avg.dur.tx, select=3, shade=T, all.terms=T, scale=0,
-     xlab="Julian Day")
-text(0.4, -0.6, "C", cex=1.5,font=2)
-
-vis.gam(m.2mo.avg.dur.tx, view=c("cent_lon", "cent_lat"), 
-        plot.type="contour", type="response", contour="black",
-        color="gray", n.grid=50, too.far=0.4,
-        main="", ylab="Latitude", xlab="Longitude")
-symbols(gam.2mo.avg.dur.tx$cent_lon[sign.slope.pos.do],gam.2mo.avg.dur.tx$cent_lat[sign.slope.pos.do],
-        circle=pred.slope.do[sign.slope.pos.do],inches=0.2*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,add=T,fg='white',bg='white')
-symbols(gam.2mo.avg.dur.tx$cent_lon[sign.slope.neg.do],gam.2mo.avg.dur.tx$cent_lat[sign.slope.neg.do],
-        circle=abs(pred.slope.do[sign.slope.neg.do]),inches=0.2*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,add=T,fg='blue',bg='blue')
-map("worldHires", fill=T, col="grey",add=T)
-```
 
 Model effects for the Average Duration model
 
