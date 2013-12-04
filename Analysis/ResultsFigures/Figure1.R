@@ -6,7 +6,9 @@
 # Code by: KM Purcell
 # updated: 2013-12-4
 ###########################################################
-windows(width=8,height=13,record=T)
+tiff(filename="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure1.tif",
+    width=6.83, height=9.19, units="in", res=300)
+
 par(mfrow=c(4,2))
 
 #DO
@@ -51,3 +53,4 @@ plot(nspm.2mo.dur.tx, select=4, shade=T, all.terms=T, scale=0,
      xlab="Julian Day",
      ylab="")
 text(0.4, -0.6, "H", cex=1.5,font=2)
+dev.off()

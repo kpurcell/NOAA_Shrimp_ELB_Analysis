@@ -8,7 +8,10 @@
 # TODO -> add letters, add symbol scale, standardize surface contour colors
 #         add code for pdf creation
 ###########################################################
-windows(width=15,height=15,record=T)
+tiff(filename="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure1.tif",
+     width=6.83, height=9.19, units="in", res=300)
+
+
 par(mfrow=c(2,2))
 ## Average tow duration
 

@@ -8,8 +8,10 @@
 # TODO -> add letters, add symbol scale, standardize surface contour colors
 #         add code for pdf creation
 ###########################################################
-windows(width=15,height=8,record=T)
-par(mfrow=c(1,2))
+tiff(filename="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure2.tif",
+     width=6.83, height=8, units="in", res=300)
+
+par(mfrow=c(2,1))
 
 #Get slope coefficients for  LA model
 pred<-predict(m.2mo.dur.la, type='terms', se.fit=T)
