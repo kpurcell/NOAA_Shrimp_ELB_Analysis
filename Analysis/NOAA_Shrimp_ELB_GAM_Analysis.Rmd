@@ -233,7 +233,7 @@ screenreg(list(nspm.2mo.dur.la,m.2mo.dur.la,nspm.2mo.dur.tx,m.2mo.dur.tx),
                                    "s(Lon., Lat.)", "s(Lon.,Lat):DO"),
                single.row=TRUE)
 
-Regression results table
+#Regression results table
 sink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table2.tex")
 texreg(list(nspm.2mo.dur.la,m.2mo.dur.la,nspm.2mo.dur.tx,m.2mo.dur.tx), 
                custom.model.names=c("NS-LA","SP-LA", "NS-TX", "SP-TX"),
@@ -246,7 +246,19 @@ texreg(list(nspm.2mo.dur.la,m.2mo.dur.la,nspm.2mo.dur.tx,m.2mo.dur.tx),
 unlink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table2.tex")
 sink(NULL)
 
-
+## Due to problems with the poisson model for tow counts and no intercept values the second part of this table
+## was added by hand to the latex file.
+# sink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table3.tex")
+# texreg(list(m.2mo.avg.dur.la,m.2mo.avg.dur.tx), 
+#                custom.model.names=c("Average Duration-LA","Average Duration-TX"),
+#                custom.coef.names=c("Intercept","2005","2006","2007","2008","2009",
+#                                    "2010", "Fuel Price", "Fishery Effort",
+#                                    "s(Depth)","s(Price)","s(Julian Day)",
+#                                    "s(Lon., Lat.)", "s(Lon.,Lat):DO"),
+#                single.row=TRUE,
+#                use.packages=TRUE)
+# unlink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table3.tex")
+# sink(NULL)
 ```
 
 
