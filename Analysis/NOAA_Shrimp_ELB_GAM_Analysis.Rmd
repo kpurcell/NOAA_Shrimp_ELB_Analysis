@@ -30,7 +30,7 @@ library(texreg)
 ## Louisiana base model with 6 week data integration
 
 ```{r LAmodelinput, echo=FALSE}
-gam.2mo.dur.la<-gam.2mo.dur.la[,c("yr","jd","hrs","do","depth", "ppnd", "la_fuel_price","towhours","areaOB","cent_lon","cent_lat")]    
+gam.2mo.dur.la<-gam.2mo.dur.la[,c("yr","jd","hrs","do","depth", "ppnd", "la_fuel_price","towhours","cent_lon","cent_lat")]    
 gam.2mo.dur.la<-na.omit(gam.2mo.dur.la)
 ```
 
@@ -67,7 +67,7 @@ summary(m.2mo.dur.la)
 ## Texas base model with 6 week data integration
 
 ```{r TXmodelInput, echo=FALSE}
-gam.2mo.dur.tx<-gam.2mo.dur.tx[,c("yr","jd","hrs","do","depth", "ppnd", "la_fuel_price","towhours","areaOB","cent_lon","cent_lat")]    
+gam.2mo.dur.tx<-gam.2mo.dur.tx[,c("yr","jd","hrs","do","depth", "ppnd", "la_fuel_price","towhours","cent_lon","cent_lat")]    
 gam.2mo.dur.tx<-na.omit(gam.2mo.dur.tx)
 ```
 
@@ -95,7 +95,7 @@ summary(m.2mo.dur.tx)
 
 ## Secondary Response variables
 
-```{r echo=FALSE}
+```{r LaTowdenInput, echo=FALSE}
 #####################################
 # Louisiana tow count
 gam.2mo.tow.count.la<-gam.2mo.tow.count.la[,c("yr","jd","hrs","do","depth", "ppnd", "la_fuel_price","tow.cnt","areaOB","cent_lon","cent_lat")]    
@@ -106,6 +106,11 @@ gam.2mo.tow.count.la<-na.omit(gam.2mo.tow.count.la)
 m.2mo.tow.count.la<-gam(tow.cnt ~ factor(yr) + la_fuel_price  + hrs   
                   + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
                     s(cent_lon,cent_lat, by=do), family=poisson,
+                  data=gam.2mo.tow.count.la)
+
+nspm.2mo.tow.count.la<-gam(tow.cnt ~ factor(yr) + la_fuel_price  + hrs   
+                  + s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat)
+                    , family=poisson,
                   data=gam.2mo.tow.count.la)
 ```
 
@@ -132,6 +137,9 @@ m.2mo.tow.count.tx<-gam(tow.cnt ~ factor(yr) + la_fuel_price  + hrs
                         + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
                           s(cent_lon,cent_lat, by=do), family=poisson,
                         data=gam.2mo.tow.count.tx)
+nspm.2mo.tow.count.tx<-gam(tow.cnt ~ factor(yr) + la_fuel_price  + hrs   
+                        + s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat), family=poisson,
+                        data=gam.2mo.tow.count.tx)
 ```
 
 
@@ -153,6 +161,10 @@ m.2mo.avg.dur.la<-gam(avg.dur ~ factor(yr) + la_fuel_price  + hrs
                         + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
                           s(cent_lon,cent_lat, by=do), data=gam.2mo.avg.dur.la)
 
+nspm.2mo.avg.dur.la<-gam(avg.dur ~ factor(yr) + la_fuel_price  + hrs   
+                        + s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat),
+                         data=gam.2mo.avg.dur.la)
+
 summary(m.2mo.avg.dur.la)
 
 ```
@@ -172,9 +184,43 @@ m.2mo.avg.dur.tx<-gam(avg.dur ~ factor(yr) + la_fuel_price  + hrs
                           s(cent_lon,cent_lat, by=do), 
                         data=gam.2mo.avg.dur.tx)
 
+nspm.2mo.avg.dur.tx<-gam(avg.dur ~ factor(yr) + la_fuel_price  + hrs   
+                        + s(do) + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat), 
+                        data=gam.2mo.avg.dur.tx)
+
 summary(m.2mo.avg.dur.tx)
 ```
 Model effects for the Average Duration model
+
+
+```{r}
+# Single Year models for vis.gam comparison
+
+la.2008<-subset(gam.2mo.dur.la, gam.2mo.dur.la$yr==2008)
+tx.2008<-subset(gam.2mo.dur.tx, gam.2mo.dur.tx$yr==2008)
+la.2009<-subset(gam.2mo.dur.la, gam.2mo.dur.la$yr==2009)
+tx.2009<-subset(gam.2mo.dur.tx, gam.2mo.dur.tx$yr==2009)
+
+m2008.la<-gam(log(towhours+1) ~ la_fuel_price + hrs +
+                    + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
+                    s(cent_lon,cent_lat, by=do),
+                    data=la.2008)
+m2008.tx<-gam(log(towhours+1) ~ la_fuel_price + hrs +
+                    + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
+                    s(cent_lon,cent_lat, by=do),
+                    data=tx.2008)
+m2009.la<-gam(log(towhours+1) ~ la_fuel_price + hrs +
+                    + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
+                    s(cent_lon,cent_lat, by=do),
+                    data=la.2009)
+m2009.tx<-gam(log(towhours+1) ~ la_fuel_price + hrs +
+                    + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
+                    s(cent_lon,cent_lat, by=do),
+                    data=tx.2009)
+```
+
+
+
 
 
 ```{r MakeFigures}
@@ -182,6 +228,7 @@ Model effects for the Average Duration model
 source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure1.R")
 source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure2.R")
 source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure3.R")
+source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure4.R")
 ```
 
 
