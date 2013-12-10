@@ -5,3 +5,7 @@
 2. add letter labels to indivdiual graphics
 3. add column and row labels to Figure 2 and 3
 4. make table script for model results from alternate response variables
+5. Change variable-coefficient plots to black instead of blue
+6. Add bubble scale to figure 2, and perhaps a color scale
+7. experiement with color on variable coefficient plots
+

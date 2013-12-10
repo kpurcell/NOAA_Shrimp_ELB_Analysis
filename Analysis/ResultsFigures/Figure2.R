@@ -26,7 +26,7 @@ max.do<-max(abs(pred.slope.do))
 # plot model output surface predictions
 vis.gam(m.2mo.dur.la, view=c("cent_lon", "cent_lat"), 
         plot.type="contour", type="response", contour="black",
-        color="gray", n.grid=50, too.far=0.2,
+        color="gray", n.grid=50, too.far=0.2, zlim=c(0.5,4.2),
         main="", ylab="Latitude", xlab="Longitude")
 
 
@@ -34,11 +34,11 @@ vis.gam(m.2mo.dur.la, view=c("cent_lon", "cent_lat"),
 symbols(gam.2mo.dur.la$cent_lon[sign.slope.pos.do],gam.2mo.dur.la$cent_lat[sign.slope.pos.do],
         circle=pred.slope.do[sign.slope.pos.do],
         inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,
-        add=T,fg='white',bg='white')
+        add=T,fg='white', bg='white')
 symbols(gam.2mo.dur.la$cent_lon[sign.slope.neg.do],gam.2mo.dur.la$cent_lat[sign.slope.neg.do],
         circle=abs(pred.slope.do[sign.slope.neg.do]),
         inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,
-        add=T,fg='blue',bg='blue')
+        add=T,fg='black', bg='black')
 
 # add coastline
 map("worldHires", fill=T, col="grey",add=T)
@@ -59,7 +59,7 @@ max.do<-max(abs(pred.slope.do))
 # plot model output surface predications
 vis.gam(m.2mo.dur.tx, view=c("cent_lon", "cent_lat"), 
         plot.type="contour", type="response", contour="black",
-        color="gray", n.grid=50, too.far=0.4,
+        color="gray", n.grid=50, too.far=0.4, zlim=c(0.5,4.2),
         main="", ylab="Latitude", xlab="Longitude")
 
 # plot symbols that = significant slope effects
