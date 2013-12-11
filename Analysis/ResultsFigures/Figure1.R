@@ -8,7 +8,7 @@
 ###########################################################
 tiff(filename="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure1.tif",
     width=6.83, height=9.19, units="in", res=300)
-windows(width=8, height=12)
+#windows(width=8, height=12)
 par(mfrow=c(4,2))
 
 #DO
