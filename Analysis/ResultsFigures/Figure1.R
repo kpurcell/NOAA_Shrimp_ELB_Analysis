@@ -53,4 +53,4 @@ plot(nspm.2mo.dur.tx, select=4, shade=T, all.terms=T, scale=0,
      xlab="Julian Day",
      ylab="")
 text(0.4, -0.6, "H", cex=1.5,font=2)
-dev.off()
+#dev.off()

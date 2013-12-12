@@ -126,30 +126,30 @@ summary(m.2mo.avg.dur.tx)
 
 # Single Year models for vis.gam comparison
 
-# la.2008<-subset(gam.2mo.dur.la, gam.2mo.dur.la$yr==2008)
-# tx.2008<-subset(gam.2mo.dur.tx, gam.2mo.dur.tx$yr==2008)
-# la.2009<-subset(gam.2mo.dur.la, gam.2mo.dur.la$yr==2009)
-# tx.2009<-subset(gam.2mo.dur.tx, gam.2mo.dur.tx$yr==2009)
-# 
-# m2008.la<-gam(log(towhours+1) ~ la_fuel_price + hrs +
-#                 + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
-#                 s(cent_lon,cent_lat, by=do),
-#               data=la.2008)
-# m2008.tx<-gam(log(towhours+1) ~ la_fuel_price + hrs +
-#                 + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
-#                 s(cent_lon,cent_lat, by=do),
-#               data=tx.2008)
-# m2009.la<-gam(log(towhours+1) ~ la_fuel_price + hrs +
-#                 + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
-#                 s(cent_lon,cent_lat, by=do),
-#               data=la.2009)
-# m2009.tx<-gam(log(towhours+1) ~ la_fuel_price + hrs +
-#                 + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
-#                 s(cent_lon,cent_lat, by=do),
-#               data=tx.2009)
-# 
+la.2008<-subset(gam.2mo.dur.la, gam.2mo.dur.la$yr==2008)
+tx.2008<-subset(gam.2mo.dur.tx, gam.2mo.dur.tx$yr==2008)
+la.2009<-subset(gam.2mo.dur.la, gam.2mo.dur.la$yr==2009)
+tx.2009<-subset(gam.2mo.dur.tx, gam.2mo.dur.tx$yr==2009)
+
+m2008.la<-gam(log(towhours+1) ~ la_fuel_price + hrs +
+                + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
+                s(cent_lon,cent_lat, by=do),
+              data=la.2008)
+m2008.tx<-gam(log(towhours+1) ~ la_fuel_price + hrs +
+                + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
+                s(cent_lon,cent_lat, by=do),
+              data=tx.2008)
+m2009.la<-gam(log(towhours+1) ~ la_fuel_price + hrs +
+                + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
+                s(cent_lon,cent_lat, by=do),
+              data=la.2009)
+m2009.tx<-gam(log(towhours+1) ~ la_fuel_price + hrs +
+                + s(depth) + s(ppnd) + s(jd) + s(cent_lon,cent_lat) + 
+                s(cent_lon,cent_lat, by=do),
+              data=tx.2009)
+
 # # ADD source files to the three figure scripts
-# source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure1.R")
+source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure1.R")
 # source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure2.R")
 # source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure3.R")
 # source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure4.R")

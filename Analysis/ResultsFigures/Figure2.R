@@ -26,7 +26,7 @@ max.do<-max(abs(pred.slope.do))
 # plot model output surface predictions
 vis.gam(m.2mo.dur.la, view=c("cent_lon", "cent_lat"), 
         plot.type="contour", type="response", contour="black",
-        color="gray", n.grid=50, too.far=0.2, zlim=c(0.5,4.2),
+        color="topo", n.grid=50, too.far=0.2, zlim=c(0.5,4.5),
         main="", ylab="Latitude", xlab="Longitude")
 
 
@@ -59,7 +59,7 @@ max.do<-max(abs(pred.slope.do))
 # plot model output surface predications
 vis.gam(m.2mo.dur.tx, view=c("cent_lon", "cent_lat"), 
         plot.type="contour", type="response", contour="black",
-        color="gray", n.grid=50, too.far=0.4, zlim=c(0.5,4.2),
+        color="topo", n.grid=50, too.far=0.4, zlim=c(0.5,4.5),
         main="", ylab="Latitude", xlab="Longitude")
 
 # plot symbols that = significant slope effects
