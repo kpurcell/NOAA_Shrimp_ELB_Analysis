@@ -70,7 +70,7 @@ symbols(gam.2mo.dur.tx$cent_lon[sign.slope.neg.do],gam.2mo.dur.tx$cent_lat[sign.
 
 # add coastline
 map("worldHires", fill=T, col="grey",add=T)
-
+dev.off()
 
 
 
