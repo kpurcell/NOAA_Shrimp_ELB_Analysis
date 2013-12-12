@@ -8,9 +8,9 @@
 # TODO -> add letters, add symbol scale, standardize surface contour colors
 #         add code for pdf creation
 ###########################################################
-tiff(filename="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure2.tif",
-     width=6.83, height=8, units="in", res=300)
-
+#tiff(filename="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure2.tif",
+#     width=6.83, height=8, units="in", res=300)
+windows(width=8, height=12)
 par(mfrow=c(2,1))
 
 #Get slope coefficients for  LA model
