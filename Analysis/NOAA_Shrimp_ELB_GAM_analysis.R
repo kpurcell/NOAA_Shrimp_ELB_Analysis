@@ -150,49 +150,50 @@ m2009.tx<-gam(log(towhours+1) ~ la_fuel_price + hrs +
 
 # # ADD source files to the three figure scripts
 source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure1.R")
-# source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure2.R")
-# source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure3.R")
-# source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure4.R")
+source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure2.R")
+source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure3.R")
+source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure4.R")
+source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Analysis\\ResultsFigures\\Figure5.R")
+
+# Summary table requested by JKC
 # 
-# # Summary table requested by JKC
-# # 
-# #Coded to pull together the table data
-# TABLEINPUT<-subset(elb.2mo.dat, elb.2mo.dat$yr<=2010)
-# 
-# YEAR<-unique(TABLEINPUT$yr)
-# 
-# #this should be a loop but no time
-# input04<-subset(TABLEINPUT, TABLEINPUT$yr==2004)
-# input05<-subset(TABLEINPUT, TABLEINPUT$yr==2005)
-# input06<-subset(TABLEINPUT, TABLEINPUT$yr==2006)
-# input07<-subset(TABLEINPUT, TABLEINPUT$yr==2007)
-# input08<-subset(TABLEINPUT, TABLEINPUT$yr==2008)
-# input09<-subset(TABLEINPUT, TABLEINPUT$yr==2009)
-# input10<-subset(TABLEINPUT, TABLEINPUT$yr==2010)
-# VESSEL2004<-length(unique(input04$vesselID))
-# VESSEL2005<-length(unique(input05$vesselID))
-# VESSEL2006<-length(unique(input06$vesselID))
-# VESSEL2007<-length(unique(input07$vesselID))
-# VESSEL2008<-length(unique(input08$vesselID))
-# VESSEL2009<-length(unique(input09$vesselID))
-# VESSEL2010<-length(unique(input10$vesselID))
-# 
-# 
-# VESSELNUM<-c(VESSEL2004,VESSEL2005,VESSEL2006,VESSEL2007,VESSEL2008,VESSEL2009,VESSEL2010)
-# TOWNUMIN<-aggregate(towhours~yr, data=TABLEINPUT, FUN=length)
-# TOWNUM<-TOWNUMIN$towhours
-# TOTEFFORT<-shrcom.yr$hrs
-# AREAHYPOXIC<-hypoxia.dat$areaOB[hypoxia.dat$yr>=2004&hypoxia.dat$yr<=2010]
-# 
-# TABLEDATA<-cbind(YEAR,VESSELNUM,TOWNUM,TOTEFFORT,AREAHYPOXIC)
-# 
-# #sort TABLEDATA by YEAR ????
-# TABLE1<-xtable(TABLEDATA)
-# sink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table1.tex")
-# print.xtable(TABLE1, type="latex")
-# unlink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table1.tex")
-# sink(NULL)
-# 
+#Coded to pull together the table data
+TABLEINPUT<-subset(elb.2mo.dat, elb.2mo.dat$yr<=2010)
+
+YEAR<-unique(TABLEINPUT$yr)
+
+#this should be a loop but no time
+input04<-subset(TABLEINPUT, TABLEINPUT$yr==2004)
+input05<-subset(TABLEINPUT, TABLEINPUT$yr==2005)
+input06<-subset(TABLEINPUT, TABLEINPUT$yr==2006)
+input07<-subset(TABLEINPUT, TABLEINPUT$yr==2007)
+input08<-subset(TABLEINPUT, TABLEINPUT$yr==2008)
+input09<-subset(TABLEINPUT, TABLEINPUT$yr==2009)
+input10<-subset(TABLEINPUT, TABLEINPUT$yr==2010)
+VESSEL2004<-length(unique(input04$vesselID))
+VESSEL2005<-length(unique(input05$vesselID))
+VESSEL2006<-length(unique(input06$vesselID))
+VESSEL2007<-length(unique(input07$vesselID))
+VESSEL2008<-length(unique(input08$vesselID))
+VESSEL2009<-length(unique(input09$vesselID))
+VESSEL2010<-length(unique(input10$vesselID))
+
+
+VESSELNUM<-c(VESSEL2004,VESSEL2005,VESSEL2006,VESSEL2007,VESSEL2008,VESSEL2009,VESSEL2010)
+TOWNUMIN<-aggregate(towhours~yr, data=TABLEINPUT, FUN=length)
+TOWNUM<-TOWNUMIN$towhours
+TOTEFFORT<-shrcom.yr$hrs
+AREAHYPOXIC<-hypoxia.dat$areaOB[hypoxia.dat$yr>=2004&hypoxia.dat$yr<=2010]
+
+TABLEDATA<-cbind(YEAR,VESSELNUM,TOWNUM,TOTEFFORT,AREAHYPOXIC)
+
+#sort TABLEDATA by YEAR ????
+TABLE1<-xtable(TABLEDATA)
+sink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table1.tex")
+print.xtable(TABLE1, type="latex")
+unlink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table1.tex")
+sink(NULL)
+
 # screenreg(list(nspm.2mo.dur.la,m.2mo.dur.la,nspm.2mo.dur.tx,m.2mo.dur.tx), 
 #           custom.model.names=c("NS-LA","SP-LA", "NS-TX", "SP-TX"),
 #           custom.coef.names=c("Intercept","2005","2006","2007","2008","2009",
@@ -200,41 +201,41 @@ source("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\A
 #                               "s(DO)","s(Depth)","s(Price)","s(Julian Day)",
 #                               "s(Lon., Lat.)", "s(Lon.,Lat):DO"),
 #           single.row=TRUE)
-# 
-# #Regression results table
-# sink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table2.tex")
-# texreg(list(nspm.2mo.dur.la,m.2mo.dur.la,nspm.2mo.dur.tx,m.2mo.dur.tx), 
-#        custom.model.names=c("NS-LA","SP-LA", "NS-TX", "SP-TX"),
-#        custom.coef.names=c("Intercept","2005","2006","2007","2008","2009",
-#                            "2010", "Fuel Price", "Fishery Effort",
-#                            "s(DO)","s(Depth)","s(Price)","s(Julian Day)",
-#                            "s(Lon., Lat.)", "s(Lon.,Lat):DO"),
-#        single.row=TRUE,
-#        use.packages=TRUE)
-# unlink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table2.tex")
+
+#Regression results table
+sink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table2.tex")
+texreg(list(nspm.2mo.dur.la,m.2mo.dur.la,nspm.2mo.dur.tx,m.2mo.dur.tx), 
+       custom.model.names=c("NS-LA","SP-LA", "NS-TX", "SP-TX"),
+       custom.coef.names=c("Intercept","2005","2006","2007","2008","2009",
+                           "2010", "Fuel Price", "Fishery Effort",
+                           "s(DO)","s(Depth)","s(Price)","s(Julian Day)",
+                           "s(Lon., Lat.)", "s(Lon.,Lat):DO"),
+       single.row=TRUE,
+       use.packages=TRUE)
+unlink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table2.tex")
+sink(NULL)
+
+## Due to problems with the poisson model for tow counts and no intercept values the second part of this table
+## was added by hand to the latex file.
+# sink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table3.tex")
+# texreg(list(m.2mo.avg.dur.la,m.2mo.avg.dur.tx), 
+#                custom.model.names=c("Average Duration-LA","Average Duration-TX"),
+#                custom.coef.names=c("Intercept","2005","2006","2007","2008","2009",
+#                                    "2010", "Fuel Price", "Fishery Effort",
+#                                    "s(Depth)","s(Price)","s(Julian Day)",
+#                                    "s(Lon., Lat.)", "s(Lon.,Lat):DO"),
+#                single.row=TRUE,
+#                use.packages=TRUE)
+# unlink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table3.tex")
 # sink(NULL)
-# 
-# ## Due to problems with the poisson model for tow counts and no intercept values the second part of this table
-# ## was added by hand to the latex file.
-# # sink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table3.tex")
-# # texreg(list(m.2mo.avg.dur.la,m.2mo.avg.dur.tx), 
-# #                custom.model.names=c("Average Duration-LA","Average Duration-TX"),
-# #                custom.coef.names=c("Intercept","2005","2006","2007","2008","2009",
-# #                                    "2010", "Fuel Price", "Fishery Effort",
-# #                                    "s(Depth)","s(Price)","s(Julian Day)",
-# #                                    "s(Lon., Lat.)", "s(Lon.,Lat):DO"),
-# #                single.row=TRUE,
-# #                use.packages=TRUE)
-# # unlink("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\table3.tex")
-# # sink(NULL)
-# ```
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# sessionInfo()
-# #save.image(file=paste(Sys.Date(), ".RData", sep=""))
+```
+
+
+
+
+
+
+
+sessionInfo()
+#save.image(file=paste(Sys.Date(), ".RData", sep=""))
 

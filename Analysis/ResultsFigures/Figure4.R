@@ -7,21 +7,25 @@
 # updated: 2013-12-10
 # TODO -> 
 ###########################################################
-#tiff(filename="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure1.tif",
-#     width=6.83, height=9.19, units="in", res=300)
 
-windows(width=8, height=12)
+bitmap("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure4.tiff", 
+       height = 9.19, width = 4.5, units = 'in', type="tifflzw", res=300)
+
+
+#windows(width=4.5, height=9.19)
 par(mfrow=c(2,1))
 
 #DO
 plot(nspm.2mo.avg.dur.la, select=1, shade=T, all.terms=T, scale=0,
-     xlab="Dissolved Oxygen (mg l ^-1)",
-     ylab="Effect of Dissolved Oxygen")
-abline(h=0)
-text(3, -2, "A", cex=1.5,font=2)
+     xlab=expression(paste("Dissolved Oxygen"~ (mg~L^{2}))),
+     ylab="Effect of Dissolved Oxygen",
+     ylim=c(-0.35,0.23))
+#abline(h=0)
+text(0.47, .22, "(a)", cex=1,font=2)
 plot(nspm.2mo.avg.dur.tx, select=1, shade=T, all.terms=T, scale=0,
-     xlab="Dissolved Oxygen (mg l^-1",
-     ylab="")
-abline(h=0)
-text(3, -2, "B", cex=1.5,font=2)
-
+     xlab=expression(paste("Dissolved Oxygen"~ (mg~L^{2}))),
+     ylab="",
+     ylim=c(-0.35,0.23))
+#abline(h=0)
+text(1.8, .22, "(b)", cex=1,font=2)
+dev.off()

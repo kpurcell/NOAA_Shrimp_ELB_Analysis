@@ -4,13 +4,14 @@
 # Inputs will come from spatial models and include slopes
 #
 # Code by: KM Purcell
-# updated: 2013-12-4
+# updated: 2013-12-13
 # TODO -> add letters, add symbol scale, standardize surface contour colors
 #         add code for pdf creation
 ###########################################################
-#tiff(filename="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure2.tif",
-#     width=6.83, height=8, units="in", res=300)
-windows(width=8, height=12)
+bitmap("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure2.tiff", 
+       height = 8, width = 6.83, units = 'in', type="tifflzw", res=300)
+
+#windows(width=6, height=9.19)
 par(mfrow=c(2,1))
 
 #Get slope coefficients for  LA model
@@ -26,22 +27,29 @@ max.do<-max(abs(pred.slope.do))
 # plot model output surface predictions
 vis.gam(m.2mo.dur.la, view=c("cent_lon", "cent_lat"), 
         plot.type="contour", type="response", contour="black",
-        color="topo", n.grid=50, too.far=0.2, zlim=c(0.5,4.5),
-        main="", ylab="Latitude", xlab="Longitude")
+        color="topo", n.grid=50, too.far=0.4, zlim=c(0.5,4.5),
+        main="", ylab="Latitude", xlab="Longitude", ylim=c(27.5,30))
 
 
 #plot symbols that = significant slopes
 symbols(gam.2mo.dur.la$cent_lon[sign.slope.pos.do],gam.2mo.dur.la$cent_lat[sign.slope.pos.do],
         circle=pred.slope.do[sign.slope.pos.do],
         inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,
-        add=T,fg='white', bg='white')
+        add=T,fg='black')
 symbols(gam.2mo.dur.la$cent_lon[sign.slope.neg.do],gam.2mo.dur.la$cent_lat[sign.slope.neg.do],
         circle=abs(pred.slope.do[sign.slope.neg.do]),
         inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,
-        add=T,fg='black', bg='black')
+        add=T,fg='red')
 
 # add coastline
 map("worldHires", fill=T, col="grey",add=T)
+# add text label
+text(-93.6, 29.9, "(a)", cex=1,font=2)
+
+#add bubble legend
+symbols(rep(-89.2,4),c(27.65,27.85,28.05,28.25),
+        circles=seq(max.do,max.do/5,length=4),add=T,inches=0.10, fg="black")
+text(-89.5,c(27.65,27.85,28.05,28.25),format(round(seq(max.do,max.do/5,length=4),2)), cex=0.8)
 
 
 
@@ -60,16 +68,23 @@ max.do<-max(abs(pred.slope.do))
 vis.gam(m.2mo.dur.tx, view=c("cent_lon", "cent_lat"), 
         plot.type="contour", type="response", contour="black",
         color="topo", n.grid=50, too.far=0.4, zlim=c(0.5,4.5),
-        main="", ylab="Latitude", xlab="Longitude")
+        main="", ylab="Latitude", xlab="Longitude", ylim=c(25.3,29.8))
 
 # plot symbols that = significant slope effects
 symbols(gam.2mo.dur.tx$cent_lon[sign.slope.pos.do],gam.2mo.dur.tx$cent_lat[sign.slope.pos.do],
-        circle=pred.slope.do[sign.slope.pos.do],inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,add=T,fg='white',bg='white')
+        circle=pred.slope.do[sign.slope.pos.do],inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,add=T,fg='black')
 symbols(gam.2mo.dur.tx$cent_lon[sign.slope.neg.do],gam.2mo.dur.tx$cent_lat[sign.slope.neg.do],
-        circle=abs(pred.slope.do[sign.slope.neg.do]),inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,add=T,fg='blue',bg='blue')
+        circle=abs(pred.slope.do[sign.slope.neg.do]),inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,add=T,fg='red')
 
 # add coastline
 map("worldHires", fill=T, col="grey",add=T)
+# add text label
+text(-97.14, 29.55, "(b)", cex=1,font=2)
+
+#add bubble legend
+symbols(rep(-94,4),c(25.6,25.9,26.2,26.5),
+        circles=seq(max.do,max.do/5,length=4),add=T,inches=0.10, fg="black")
+text(-94.2,c(25.6,25.9,26.2,26.5),format(round(seq(max.do,max.do/5,length=4),2)), cex=0.8)
 dev.off()
 
 
