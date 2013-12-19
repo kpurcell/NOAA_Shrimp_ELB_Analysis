@@ -31,7 +31,8 @@ vis.gam(avg.dur.2008, view=c("cent_lon", "cent_lat"),zlim=c(3,9),
         color="topo", n.grid=50, too.far=0.2,
         main="High Hypoxia", ylab="Latitude", xlab="Longitude")
 map("worldHires", fill=T, col="grey",add=T)
-
+# add text label
+text(-93.6, 29.82, "(a)", cex=1,font=2)
 
 #Plot model predicted surface for Tx model
 vis.gam(avg.dur.2009, view=c("cent_lon", "cent_lat"),zlim=c(3,9),
@@ -40,7 +41,8 @@ vis.gam(avg.dur.2009, view=c("cent_lon", "cent_lat"),zlim=c(3,9),
         main="Low Hypoxia", ylab="Latitude", xlab="Longitude")
 #add coastline
 map("worldHires", fill=T, col="grey",add=T)
-
+# add text label
+text(-93.6, 29.82, "(b)", cex=1,font=2)
 
 vis.gam(tow.cnt.2008, view=c("cent_lon", "cent_lat"),zlim=c(-1,30),
         plot.type="contour", type="response", contour="black",
@@ -48,7 +50,8 @@ vis.gam(tow.cnt.2008, view=c("cent_lon", "cent_lat"),zlim=c(-1,30),
         main="", ylab="Latitude", xlab="Longitude")
 #add coastline
 map("worldHires", fill=T, col="grey",add=T)
-
+# add text label
+text(-93.6, 29.82, "(c)", cex=1,font=2)
 #Plot model predictions surfaces for LA model
 vis.gam(tow.cnt.2009, view=c("cent_lon", "cent_lat"), zlim=c(-1,30),
         plot.type="contour", type="response", contour="black",
@@ -57,3 +60,9 @@ vis.gam(tow.cnt.2009, view=c("cent_lon", "cent_lat"), zlim=c(-1,30),
 
 #add coastline
 map("worldHires", fill=T, col="grey",add=T)
+# add text label
+text(-93.6, 29.82, "(d)", cex=1,font=2)
+
+
+
+

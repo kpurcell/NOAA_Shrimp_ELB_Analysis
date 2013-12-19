@@ -12,7 +12,7 @@ bitmap("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\P
        height = 9.19, width = 6.83, units = 'in', type="tifflzw", res=300)
 
 
-#windows(width=8, height=9.19)
+windows(width=8, height=9.19)
 par(mfrow=c(2,2))
 
 #Plot model predictions surfaces for LA model

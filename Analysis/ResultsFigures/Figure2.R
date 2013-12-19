@@ -11,7 +11,7 @@
 bitmap("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure2.tiff", 
        height = 8, width = 6.83, units = 'in', type="tifflzw", res=300)
 
-#windows(width=6, height=9.19)
+windows(width=6, height=9.19)
 par(mfrow=c(2,1))
 
 #Get slope coefficients for  LA model
@@ -35,11 +35,11 @@ vis.gam(m.2mo.dur.la, view=c("cent_lon", "cent_lat"),
 symbols(gam.2mo.dur.la$cent_lon[sign.slope.pos.do],gam.2mo.dur.la$cent_lat[sign.slope.pos.do],
         circle=pred.slope.do[sign.slope.pos.do],
         inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,
-        add=T,fg='black')
+        add=T,fg='black', bg='black')
 symbols(gam.2mo.dur.la$cent_lon[sign.slope.neg.do],gam.2mo.dur.la$cent_lat[sign.slope.neg.do],
         circle=abs(pred.slope.do[sign.slope.neg.do]),
         inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,
-        add=T,fg='red')
+        add=T,fg='red', bg='red')
 
 # add coastline
 map("worldHires", fill=T, col="grey",add=T)
@@ -72,9 +72,9 @@ vis.gam(m.2mo.dur.tx, view=c("cent_lon", "cent_lat"),
 
 # plot symbols that = significant slope effects
 symbols(gam.2mo.dur.tx$cent_lon[sign.slope.pos.do],gam.2mo.dur.tx$cent_lat[sign.slope.pos.do],
-        circle=pred.slope.do[sign.slope.pos.do],inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,add=T,fg='black')
+        circle=pred.slope.do[sign.slope.pos.do],inches=0.15*max(range(pred.slope.do[sign.slope.pos.do]))/max.do,add=T,fg='black', bg='black')
 symbols(gam.2mo.dur.tx$cent_lon[sign.slope.neg.do],gam.2mo.dur.tx$cent_lat[sign.slope.neg.do],
-        circle=abs(pred.slope.do[sign.slope.neg.do]),inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,add=T,fg='red')
+        circle=abs(pred.slope.do[sign.slope.neg.do]),inches=0.15*max(range(pred.slope.do[sign.slope.pos.do], finite=T))/max.do,add=T,fg='red', bg='red')
 
 # add coastline
 map("worldHires", fill=T, col="grey",add=T)

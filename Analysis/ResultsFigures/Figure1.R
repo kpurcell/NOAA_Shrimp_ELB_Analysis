@@ -10,7 +10,7 @@ bitmap("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\P
        height = 9.19, width = 5, units = 'in', type="tifflzw", res=300)
 
 
-#windows(width=5, height=9.19)
+windows(width=5, height=9.19)
 par(mfrow=c(4,2))
 
 #DO
