@@ -226,6 +226,8 @@ figure/*
 *.pdf
 *.gz
 
+# Pandoc products
+*.docx
 
 
 
