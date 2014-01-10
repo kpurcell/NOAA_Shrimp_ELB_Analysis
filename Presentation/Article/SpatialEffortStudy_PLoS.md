@@ -11,6 +11,8 @@ K.M. Purcell^1*^, J.K. Craig^1^, J.M. Nance^2^, M.D. Smith^3^
 
 
 ## Introduction
+While fishery catches or landings are decreasing globally the spatial footprint of global fisheries is expaning.  Recently a number of studies [@Steart;@Swartz...] have examined the spatial extent of fisheries and they are growing.
+
 importance of knowledge of spatial distribution of a fishery
 how fishermen make spatial decisions for the application of fishing effort
 What impact environmental disturbances play in the the decision making process and what impacts that has on the resource management.  
