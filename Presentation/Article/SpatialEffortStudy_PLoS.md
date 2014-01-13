@@ -7,15 +7,20 @@ K.M. Purcell^1*^, J.K. Craig^1^, J.M. Nance^2^, M.D. Smith^3^
 ^3^ Nicholas School of the Environment, Duke University, Durham, NC, USA  
 ^*^ E-mail: Corresponding kevin@kevin-purcell.com  
 
-## Abstract
+## Abstract  
 
 
 ## Introduction
-While fishery catches or landings are decreasing globally the spatial footprint of global fisheries is expaning.  Recently a number of studies [@Steart;@Swartz...] have examined the spatial extent of fisheries and they are growing.
-	
+While fishery catches or landings are decreasing globally the spatial footprint of global fisheries is expanding.  [@worm2012future; @zeller2005good; ?]  Much of this data is often discounted due to the overwhelming influence changing patterns of fishing effort [cite] or misreporting of fishing effort allocation [@watson2001systematic].  Watson et al. [@watson2012global] concerns regarding stagnant or declining catch statistics with an anlysis of fishing power relative to catch.  They found that in the last half century fisheries have enjoyed a 10-fold increase in fishing power but adjusted landings are estimated to be half what they were in the 1950s.  
+
+Recently a number of studies [@Steart;@Swartz...] have examined the spatial extent of fisheries and they are growing.
+-cite studies of boadening spatial footprint	
 importance of knowledge of spatial distribution of a fishery
-how fishermen make spatial decisions for the application of fishing effort
+
+how fishermen make spatial decisions for the application of fishing effort [@abernethy_2007_why; @branch_2006_fleet]
+
 What impact environmental disturbances play in the the decision making process and what impacts that has on the resource management.  
+
 
 Marine and coastal ecosystems are being increasingly affected by patterns of environmental hypoxia which have been documented in over 400 marine systems affecting greater than 240,000 km^2^ [@diaz_spreading_2008].  Environmental hypoxia, a condition of < 2 mgL^-1^ dissolved oxygen (DO), is generally a product of excess consumption of oxygen through respiration and chemical processes relative to the rate of production.  Hypoxia, especially in shallow water coastal systems, is more common in areas with high nutrient inputs, longer residence times and physical stratification, characteristics common to coastal and estuarine systems [@rabalais_global_2009].  Currently, the northern Gulf of Mexico (Gulf) experiences one of the largest seasonal hypoxia events in the western hemisphere [@rabalais_beyond_2002].  The areal extent of Gulf hypoxia coverage has been estimated annually since 1985 and has shown significant variation exceeding 20,000 km^2^ in recent years (Rabalais ?, Turner et al. 2008 via aggregations: Figure 1).  Hindcasting models and paleo-indicator studies show indications of low oxygen stress within the Gulf beginning in the early 1900s becoming increasingly severe during the 1960s and 1970s [@justic_forecasting_2007; @rabalais_sediments_2007; @greene_multiple_2009].  The causal mechanisms for natural and anthropogenically mediated hypoxia have been extensively discussed in the literature [@bianchi_science_2010; @rabalais_dynamics_2010; @zhang_natural_2010] with a clear consensus that Gulf hypoxia is driven by increased eutrophication subsequent to the Mississippi-Atchafalaya River systems which is directly adjacent to the Louisiana coastal shelf.  The increased nutrient loading to the coastal shelf and the vertical stratification that result from seasonal river flow creates ideal conditions for the annual development of bottom water hypoxia [@rabalais_beyond_2002; @bianchi_science_2010].  The hypoxic zone (region with < 2.0 mgL^-1^ DO) is highly variable spatially, depending on prevailing weather patterns and coastal currents [@feng2012relative; @hetland_skill_2012; @wiseman_seasonal_1997].
 
