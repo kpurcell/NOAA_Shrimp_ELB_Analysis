@@ -8,12 +8,18 @@
 # TODO -> add letters, add symbol scale, standardize surface contour colors
 #         add code for pdf creation
 ###########################################################
-postscript(file="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure3.ps", 
-           horizontal=F,
-           onefile=F,
-           width=3.27, height=9.19,
-           family="Arial",
-           pointsize=12)
+pdf(file="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure3.pdf",
+    width = 6.83, height = 9.19, 
+    family = "Arial", 
+    paper = "special", 
+    onefile = FALSE)
+
+# postscript(file="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure3.ps", 
+#            horizontal=F,
+#            onefile=F,
+#            width=3.27, height=9.19,
+#            family="Arial",
+#            pointsize=12)
 par(mfrow=c(2,2))
 
 #Plot model predictions surfaces for LA model

@@ -6,12 +6,17 @@
 # Code by: KM Purcell
 # updated: 2013-12-13
 ###########################################################
+pdf(file="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure1.pdf",
+    width = 4.86, height = 9.19, 
+    family = "Arial", 
+    paper = "special", 
+    onefile = FALSE)
 
-postscript(file="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure1.eps", horizontal=F,
-           onefile=F,
-           width=6.83, height=9.19,
-           family="Arial",
-           pointsize=12)
+# postscript(file="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure1.eps", horizontal=F,
+#            onefile=F,
+#            width=6.83, height=9.19,
+#            family="Arial",
+#            pointsize=12)
 
 par(mfrow=c(4,2))
 
