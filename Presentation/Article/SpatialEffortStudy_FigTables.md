@@ -1,7 +1,28 @@
 ## Figure Legends
 
+**Figure 1. Model smoothes.** 1-dimensional smooth plots for environmental and economic model
+parameters. Left column plots are for the Louisiana models and right column represent Texas. The
+effects of dissolved oxygen (mgL^-1^1) (A,B), depth in meters (m)(C,D) and price per pound in US dollars (USD) (E,F) and Julian day (G,H). Shaded area represents the 95\% confidence intervals.
+ 
+**Figure 2. Model prediction.** Fishing effort predictions for Louisiana (A) and Texas (B) spatial
+models. Circles represent the positive (black) and negative (red) rate of change (ie slope) in fishing
+effort for each unit of dissolved oxygen.
+
+**Figure 3. Hypoxia comparison.** Predicted fishing effort values based on the spatial model
+formulation for the Louisiana region under high (A) and low (B) hypoxia conditions and the Texas
+model under high (C) and low (D) hypoxia conditions.
+
+**Figure 4. Average Tow Duration.** Smooth relationships between average tow duration and
+dissolved oxygen concentration for the Louisiana (A) and Texas (B) coastal shelves. Shaded area
+represent the 95\% confidence intervals.
+
+**Figure 5. Tow Density.** Smooth relationships between tow density and dissolved oxygen
+concentration for the Louisiana (A) and Texas (B) coastal shelves. Shaded area represent the 95\%
+confidence intervals.
+
 
 ## Tables
+
 
 ### Table 1
 
@@ -42,6 +63,7 @@ GCV score      0.80              0.79               0.71                0.70
 
 
 ### Table 3
+
 
 Term             AD-LA             AD-LA              TC-TX               TC-TX
 ----------       --------------    -----------        --------------      --------------
