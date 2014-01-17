@@ -8,10 +8,12 @@
 # TODO -> 
 ###########################################################
 
-bitmap("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure5.tiff", 
-       height = 9.19, width = 4.5, units = 'in', type="tifflzw", res=300)
-
-windows(width=4.5, height=9.19)
+postscript(file="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure5.ps", 
+           horizontal=F,
+           onefile=F,
+           width=3.27, height=9.19,
+           family="Arial",
+           pointsize=12)
 par(mfrow=c(2,1))
 
 #DO

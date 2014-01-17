@@ -6,11 +6,13 @@
 # Code by: KM Purcell
 # updated: 2013-12-13
 ###########################################################
-bitmap("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure1.tiff", 
-       height = 9.19, width = 5, units = 'in', type="tifflzw", res=300)
 
+postscript(file="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure1.ps", horizontal=F,
+           onefile=F,
+           width=6.83, height=9.19,
+           family="Arial",
+           pointsize=12)
 
-windows(width=5, height=9.19)
 par(mfrow=c(4,2))
 
 #DO
@@ -55,4 +57,5 @@ plot(nspm.2mo.dur.tx, select=4, shade=T, all.terms=T, scale=0,
      xlab="Julian Day",
      ylab="")
 text(242,0.17, "(h)", cex=1,font=2)
+
 dev.off()

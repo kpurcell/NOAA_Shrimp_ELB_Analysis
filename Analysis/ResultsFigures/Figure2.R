@@ -8,10 +8,13 @@
 # TODO -> add letters, add symbol scale, standardize surface contour colors
 #         add code for pdf creation
 ###########################################################
-bitmap("C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure2.tiff", 
-       height = 8, width = 6.83, units = 'in', type="tifflzw", res=300)
+postscript(file="C:\\Users\\Kevin.Purcell\\Documents\\GitHub\\NOAA_Shrimp_ELB_Analysis\\Presentation\\Article\\figure\\Figure2.ps", 
+           horizontal=F,
+           onefile=F,
+           width=3.27, height=9.19,
+           family="Arial",
+           pointsize=12)
 
-windows(width=6, height=9.19)
 par(mfrow=c(2,1))
 
 #Get slope coefficients for  LA model
