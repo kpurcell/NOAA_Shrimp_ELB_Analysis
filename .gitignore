@@ -228,6 +228,6 @@ figure/*
 
 # Pandoc products
 *.docx
-
+*.Rhistory
 
 
